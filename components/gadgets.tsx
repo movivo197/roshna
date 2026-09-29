@@ -1,16 +1,51 @@
 'use client';
 
 import {useCallback, useEffect, useRef, useState, type CSSProperties} from 'react';
-import {ArrowLeft, Check, ChevronLeft, Clock3, Eye, Flower2, Heart, History, Leaf, Pause, Play, RotateCcw, ShieldCheck, Sparkles, Sprout, Trash2, WandSparkles, Wind, X, Zap} from 'lucide-react';
+import {
+  ArrowLeft,
+  Check,
+  ChevronLeft,
+  Clock3,
+  Eye,
+  Flame,
+  Flower2,
+  Heart,
+  History,
+  Inbox,
+  Leaf,
+  Lock,
+  Music,
+  Pause,
+  Play,
+  Radio,
+  RotateCcw,
+  ShieldCheck,
+  Sparkles,
+  Sprout,
+  Trash2,
+  Volume2,
+  VolumeX,
+  WandSparkles,
+  Wind,
+  X,
+  Zap,
+  Archive,
+  Compass
+} from 'lucide-react';
 import {faNumber as n, uid, type GadgetRecord, type GrowthData} from '@/lib/growth-data';
 
 type Kind = GadgetRecord['kind'];
 type Save = (record: GadgetRecord) => Promise<boolean>;
 type Props = {data: GrowthData; update: (change: (current: GrowthData) => GrowthData) => Promise<boolean>; notify: (message: string) => void};
+
 const tools = [
   {id:'reframe', title:'کارگاه باور تازه', description:'یک باور تکرارشونده را ببین؛ یک نگاه تازه و باورپذیر به جایش بنویس.', tag:'ذهن', time:'۲ دقیقه', tone:'mint', icon:WandSparkles},
   {id:'release', title:'رها کن، جا باز کن', description:'فکرت را روی یک سنگ بگذار. نگه دار، رها کن و سبک‌تر ادامه بده.', tag:'ذهن', time:'۱ دقیقه', tone:'rose', icon:Zap},
   {id:'breathing', title:'یک نفس، یک مکث', description:'برای چند لحظه با یک دایره آرام همراه شو و به نفست توجه کن.', tag:'آرامش', time:'۱–۲ دقیقه', tone:'blue', icon:Wind},
+  {id:'breathe478', title:'تنفس عمیق ۴-۷-۸', description:'۴ ثانیه دم، ۷ ثانیه حبس و ۸ ثانیه بازدم آرام برای ریست سیستم عصبی.', tag:'تنفس', time:'۲ دقیقه', tone:'mint', icon:Sparkles},
+  {id:'frequency', title:'فرکانس‌های ذهن و ارتعاش', description:'نوای زنده ۴۳۲Hz، ۵۲۸Hz و امواج آلفا/تتا با تولیدکننده صوت درونی.', tag:'فرکانس', time:'پخش زنده', tone:'cyan', icon:Radio},
+  {id:'shadow', title:'آینه سایه‌ها', description:'کشف ریشه خشم و رنجش از دیگران و یکپارچه‌سازی سایه با شفقت.', tag:'خودشناسی', time:'۳ دقیقه', tone:'purple', icon:Flame},
+  {id:'surrender', title:'صندوق توکل و رهایی', description:'سپردن دغدغه‌های خارج از کنترل به صندوق امن و رهایی از استرس نتیجه.', tag:'آرامش', time:'۱ دقیقه', tone:'gold', icon:Archive},
   {id:'grounding', title:'برگرد به همین‌جا', description:'با پنج حس، دوباره به همین لحظه و دنیای اطرافت توجه کن.', tag:'حضور', time:'۲ دقیقه', tone:'lilac', icon:Eye},
   {id:'body', title:'بدنت را به یاد بیاور', description:'چهار مکث کوچک میان کارهای روز؛ برای توجه به نیازهای بدنت.', tag:'جسم', time:'به ریتم تو', tone:'peach', icon:Sprout},
   {id:'gratitude', title:'سه نقطه روشن', description:'سه چیز کوچک که امروز برایت ارزشمند بودند، در یک کارت نگه دار.', tag:'دل', time:'۲ دقیقه', tone:'gold', icon:Heart},
@@ -31,7 +66,7 @@ export default function Gadgets({data,update,notify}:Props){
   const reduced=useReducedMotion(), saving=useRef(false), workbench=useRef<HTMLElement>(null);
   const history=(data.gadgets||[]).slice().sort((a,b)=>b.createdAt.localeCompare(a.createdAt));
   const visible=history.filter(entry=>filter==='all'||entry.kind===filter);
-  const current=tools.find(tool=>tool.id===selected)!;
+  const current=tools.find(tool=>tool.id===selected) || tools[0];
   const save:Save=useCallback(async record=>{
     if(saving.current)return false;
     saving.current=true;setBusy(true);
@@ -53,6 +88,10 @@ export default function Gadgets({data,update,notify}:Props){
         {selected==='reframe'&&<Reframe save={save} seed={seed} effects={effects&&!reduced}/>}
         {selected==='release'&&<Release save={save} effects={effects&&!reduced} haptics={haptics&&!reduced}/>}
         {selected==='breathing'&&<Breathing save={save}/>}
+        {selected==='breathe478'&&<Breathing478 save={save} haptics={haptics&&!reduced}/>}
+        {selected==='frequency'&&<FrequencyTuner save={save}/>}
+        {selected==='shadow'&&<ShadowWork save={save} seed={seed}/>}
+        {selected==='surrender'&&<SurrenderBox save={save} effects={effects&&!reduced}/>}
         {selected==='grounding'&&<Grounding save={save}/>}
         {selected==='body'&&<BodyPause save={save}/>}
         {selected==='gratitude'&&<Gratitude save={save}/>}
@@ -61,7 +100,7 @@ export default function Gadgets({data,update,notify}:Props){
     </section>
     <section className="gx-history" aria-labelledby="gadgets-history-title"><header><div><span className="gx-eyebrow">ردِ قدم‌های کوچک تو</span><h2 id="gadgets-history-title"><History size={20}/> تاریخچه گجت‌ها <span className="g-tag">{n(history.length)} تمرین</span></h2></div><p>همراه با بقیه اطلاعاتت در فایل پشتیبان ذخیره می‌شود.</p></header>
       <div className="gx-history-filters" aria-label="فیلتر تاریخچه"><button className={filter==='all'?'active':''} onClick={()=>{setFilter('all');setLimit(10)}}>همه</button>{tools.map(tool=><button key={tool.id} className={filter===tool.id?'active':''} onClick={()=>{setFilter(tool.id);setLimit(10)}}>{tool.title}</button>)}</div>
-      {!visible.length?<div className="gx-history-empty"><Sprout size={30}/><h3>{history.length?'هنوز تمرینی در این بخش نیست.':'اولین تجربه‌ات را ثبت کن.'}</h3><p>هر مکث کوچک، یک رد روشن در مسیر تو می‌گذارد.</p></div>:<div className="gx-history-list">{visible.slice(0,limit).map(entry=>{const tool=tools.find(t=>t.id===entry.kind)!;return <article className="gx-history-item" key={entry.id}><span className={`gx-tile-icon tone-${tool.tone}`}><tool.icon size={20}/></span><div className="gx-history-content"><div className="gx-history-title"><h3>{tool.title}</h3><time dateTime={entry.createdAt}>{new Date(entry.createdAt).toLocaleString('fa-IR',{month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'})}</time></div>{entry.kind==='reframe'?<div className="gx-history-change"><div className="gx-old"><small>نگاه قبلی</small><p>{entry.before}</p></div><ArrowLeft size={18}/><div className="gx-new"><small>نگاه تازه</small><p>{entry.after}</p></div></div>:entry.kind==='release'?<p className="gx-history-text">{entry.before?`با این فکر فاصله گرفتم: «${entry.before}»`:'یک فکر را نمادین رها کردم؛ متن آن نگهداری نشده است.'}</p>:<p className="gx-history-text">{entry.after}</p>}{entry.note&&<p className="gx-history-text">{entry.note}</p>}{entry.kind==='reframe'&&<button className="g-text-btn" disabled={busy} onClick={()=>{setSeed(entry);setSelected('reframe');workbench.current?.scrollIntoView({behavior:reduced?'instant':'smooth',block:'start'})}}><RotateCcw size={14}/>دوباره به این باور نگاه کنم</button>}</div><button className="g-icon-btn danger" aria-label={`حذف ${tool.title} از تاریخچه`} disabled={busy} onClick={()=>void remove(entry.id)}><Trash2 size={16}/></button></article>})}</div>}
+      {!visible.length?<div className="gx-history-empty"><Sprout size={30}/><h3>{history.length?'هنوز تمرینی در این بخش نیست.':'اولین تجربه‌ات را ثبت کن.'}</h3><p>هر مکث کوچک، یک رد روشن در مسیر تو می‌گذارد.</p></div>:<div className="gx-history-list">{visible.slice(0,limit).map(entry=>{const tool=tools.find(t=>t.id===entry.kind) || tools[0];return <article className="gx-history-item" key={entry.id}><span className={`gx-tile-icon tone-${tool.tone}`}><tool.icon size={20}/></span><div className="gx-history-content"><div className="gx-history-title"><h3>{tool.title}</h3><time dateTime={entry.createdAt}>{new Date(entry.createdAt).toLocaleString('fa-IR',{month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'})}</time></div>{entry.kind==='reframe'?<div className="gx-history-change"><div className="gx-old"><small>نگاه قبلی</small><p>{entry.before}</p></div><ArrowLeft size={18}/><div className="gx-new"><small>نگاه تازه</small><p>{entry.after}</p></div></div>:entry.kind==='shadow'?<div className="gx-history-change"><div className="gx-old"><small>محرک بیرونی</small><p>{entry.before}</p></div><ArrowLeft size={18}/><div className="gx-new"><small>ریشه و پذیرش درون</small><p>{entry.after}</p></div></div>:entry.kind==='release'?<p className="gx-history-text">{entry.before?`با این فکر فاصله گرفتم: «${entry.before}»`:'یک فکر را نمادین رها کردم؛ متن آن نگهداری نشده است.'}</p>:entry.kind==='surrender'?<p className="gx-history-text">دغدغه سپرده شده: «{entry.before}» {entry.note ? `[${entry.note}]` : ''}</p>:<p className="gx-history-text">{entry.after}</p>}{entry.note&&entry.kind!=='shadow'&&entry.kind!=='surrender'&&<p className="gx-history-text">{entry.note}</p>}{entry.kind==='reframe'&&<button className="g-text-btn" disabled={busy} onClick={()=>{setSeed(entry);setSelected('reframe');workbench.current?.scrollIntoView({behavior:reduced?'instant':'smooth',block:'start'})}}><RotateCcw size={14}/>دوباره به این باور نگاه کنم</button>}</div><button className="g-icon-btn danger" aria-label={`حذف ${tool.title} از تاریخچه`} disabled={busy} onClick={()=>void remove(entry.id)}><Trash2 size={16}/></button></article>})}</div>}
       {visible.length>limit&&<button className="g-btn gx-load-more" onClick={()=>setLimit(count=>count+10)}>نمایش تمرین‌های بیشتر</button>}
     </section>
   </div>;
@@ -136,6 +175,724 @@ function Breathing({save}:{save:Save}){
   return <div className="gx-grid-two"><div><h3>فقط همراه نفست باش.</h3><p className="gx-help">دایره باز می‌شود: دم آرام. جمع می‌شود: بازدم آرام. نفست را نگه ندار و ریتم را به خودت تحمیل نکن؛ هر زمان خواستی مکث کن.</p><div className="gx-timer-options">{[60,120].map(seconds=><button className={`g-btn ${duration===seconds?'primary':''}`} key={seconds} disabled={running||saving} onClick={()=>reset(seconds)}>{n(seconds/60)} دقیقه</button>)}</div><div className="gx-actions">{complete?<><button className="g-btn primary" disabled={saving||saved} onClick={()=>void store()}><Check size={17}/>{saved?'در تاریخچه ثبت شد':saving?'در حال ثبت…':'ثبت این مکث'}</button><button className="g-btn" disabled={saving} onClick={()=>reset()}><RotateCcw size={16}/>از نو</button></>:<><button className="g-btn primary" onClick={()=>{if(running)pause();else{started.current=performance.now();setRunning(true);setMessage('')}}}>{running?<Pause size={17}/>:<Play size={17}/>} {running?'مکث':elapsed?'ادامه':'شروع تنفس همراه'}</button>{elapsed>0&&<button className="g-btn" onClick={()=>reset()}>از ابتدا</button>}</>}</div><p className="gx-help">اگر این ریتم برایت راحت نیست، تمرین را متوقف کن و عادی نفس بکش.</p>{message&&<p className="gx-inline-status" role="status">{message}</p>}</div><div className="gx-stage gx-breathe-stage"><div className={`gx-breathe-orb ${running?inhale?'is-inhale':'is-exhale':'is-rest'}`}><Wind size={32}/><strong aria-live="polite">{complete?'چه خوب که مکث کردی':running?inhale?'دم آرام':'بازدم آرام':elapsed?'یک مکث':'یک نفس تازه'}</strong><span>{running?(inhale?'۴ ثانیه، با آرامش':'۶ ثانیه، بدون عجله'):'با ریتم راحت خودت'}</span></div><span className="gx-breathe-time">{n(Math.max(0,Math.ceil(duration-elapsed)))} ثانیه باقی مانده</span></div></div>;
 }
 
+/* ─────────────────────────────────────────────────────────────
+   NEW GADGET: 4-7-8 Deep Breathing (Dr. Andrew Weil Method)
+   ───────────────────────────────────────────────────────────── */
+function Breathing478({save, haptics}:{save:Save; haptics:boolean}){
+  const [phase, setPhase] = useState<'idle' | 'inhale' | 'hold' | 'exhale'>('idle');
+  const [cycle, setCycle] = useState(1);
+  const [totalCycles, setTotalCycles] = useState(4);
+  const [count, setCount] = useState(4);
+  const [running, setRunning] = useState(false);
+  const [completed, setCompleted] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [id, setId] = useState(uid);
+
+  const phaseRef = useRef(phase);
+  phaseRef.current = phase;
+  const cycleRef = useRef(cycle);
+  cycleRef.current = cycle;
+  const totalRef = useRef(totalCycles);
+  totalRef.current = totalCycles;
+
+  const vibrate = useCallback((p: number | number[]) => {
+    try {
+      if (haptics && typeof navigator.vibrate === 'function') navigator.vibrate(p);
+    } catch {}
+  }, [haptics]);
+
+  useEffect(() => {
+    if (!running) return;
+    let timer: any;
+
+    const tick = () => {
+      setCount(prev => {
+        if (prev > 1) {
+          return prev - 1;
+        }
+
+        // Transition to next phase
+        const curPhase = phaseRef.current;
+        if (curPhase === 'inhale') {
+          setPhase('hold');
+          vibrate([40, 60]);
+          return 7;
+        } else if (curPhase === 'hold') {
+          setPhase('exhale');
+          vibrate([70, 90]);
+          return 8;
+        } else if (curPhase === 'exhale') {
+          if (cycleRef.current >= totalRef.current) {
+            setRunning(false);
+            setCompleted(true);
+            setPhase('idle');
+            vibrate([100, 100, 150]);
+            return 0;
+          } else {
+            setCycle(c => c + 1);
+            setPhase('inhale');
+            vibrate([40, 50]);
+            return 4;
+          }
+        }
+        return 4;
+      });
+    };
+
+    timer = setInterval(tick, 1000);
+    return () => clearInterval(timer);
+  }, [running, vibrate]);
+
+  function start() {
+    setRunning(true);
+    setCompleted(false);
+    setSaved(false);
+    setCycle(1);
+    setPhase('inhale');
+    setCount(4);
+    vibrate([40, 50]);
+  }
+
+  function stop() {
+    setRunning(false);
+    setPhase('idle');
+    setCount(4);
+    setCycle(1);
+  }
+
+  async function store() {
+    if (saved || saving) return;
+    setSaving(true);
+    try {
+      const ok = await save(newRecord('breathe478', id, {
+        after: `${n(totalCycles)} چرخه تنفس آرامش‌بخش ۴-۷-۸ برای تنظیم سیستم عصبی`,
+        seconds: totalCycles * 19
+      }));
+      setSaved(ok);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="gx-grid-two">
+      <div>
+        <h3>تکنیک تنفس آرام‌بخش ۴-۷-۸</h3>
+        <p className="gx-help">
+          این متد علمی با کاهش ضربان قلب و تحریک عصب واگ، در کمتر از دو دقیقه اضطراب شدید را مهار و ذهن را برای خواب یا تمرکز آماده می‌کند.
+        </p>
+        <div className="gx-timer-options">
+          {[4, 8].map(num => (
+            <button
+              key={num}
+              type="button"
+              className={`g-btn ${totalCycles === num ? 'primary' : ''}`}
+              disabled={running || saving}
+              onClick={() => { setTotalCycles(num); stop(); }}
+            >
+              {n(num)} چرخه ({n(Math.round(num * 19 / 60))} دقیقه)
+            </button>
+          ))}
+        </div>
+        <div className="gx-actions">
+          {completed ? (
+            <>
+              <button type="button" className="g-btn primary" disabled={saving || saved} onClick={() => void store()}>
+                <Check size={16}/> {saved ? 'در تاریخچه ثبت شد' : saving ? 'در حال ثبت…' : 'ثبت این تمرین آرامش'}
+              </button>
+              <button type="button" className="g-btn" onClick={() => { setCompleted(false); setId(uid()); start(); }}>
+                <RotateCcw size={16}/> انجام دوباره
+              </button>
+            </>
+          ) : running ? (
+            <button type="button" className="g-btn danger" onClick={stop}>
+              <Pause size={16}/> توقف تمرین
+            </button>
+          ) : (
+            <button type="button" className="g-btn primary" onClick={start}>
+              <Play size={16}/> شروع تنفس ۴-۷-۸
+            </button>
+          )}
+        </div>
+        <p className="gx-help">
+          الگو: ۴ ثانیه دم آرام از بینی · ۷ ثانیه حبس آرام هوا · ۸ ثانیه بازدم کامل و عمیق با صدای ملایم از دهان.
+        </p>
+      </div>
+
+      <div className="gx-stage gx-breathe478-stage">
+        <div className={`gx-breathe478-orb is-${phase}`}>
+          <Wind size={36} className="gx-breathe-icon" />
+          <strong className="gx-breathe-state">
+            {phase === 'inhale' ? 'دم عمیق از بینی' : phase === 'hold' ? 'حبس آرام هوا' : phase === 'exhale' ? 'بازدم کامل از دهان' : completed ? 'احسنت! آرامش برقرار شد' : 'آماده برای تنفس'}
+          </strong>
+          <span className="gx-breathe-timer-count">{running ? n(count) : '۴-۷-۸'}</span>
+          {running && <small className="gx-breathe-cycle-badge">چرخه {n(cycle)} از {n(totalCycles)}</small>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────
+   NEW GADGET: Abundance & Brainwave Tuner (Web Audio API)
+   ───────────────────────────────────────────────────────────── */
+const FREQS = [
+  {id: '432', hz: 432, subHz: 216, name: '۴۳۲ هرتز · هارمونی زمین', tag: 'آرامش عمیق', desc: 'بسامد هماهنگی با طبیعت، کاهش ضربان قلب و تسکین تنش‌های کهنه.'},
+  {id: '528', hz: 528, subHz: 264, name: '۵۲۸ هرتز · تحول و انرژی', tag: 'گشایش قلب', desc: 'معروف به فرکانس معجزه و عشق؛ افزایش سرزندگی و رهایی از استرس.'},
+  {id: 'alpha', hz: 210, beatHz: 10, isBinaural: true, name: '۱۰ هرتز (Binaural Alpha)', tag: 'تمرکز و یادگیری', desc: 'امواج مغزی آلفا برای تمرکز هوشیارانه، خلاقیت و ورود به فلو استیت.'},
+  {id: 'theta', hz: 194, beatHz: 6, isBinaural: true, name: '۶ هرتز (Binaural Theta)', tag: 'مراقبه و رهایی', desc: 'امواج آرام‌بخش تتا برای رهایی از قفل‌های ذهنی و استراحت عمیق مغز.'},
+  {id: 'om', hz: 136.1, harmonics: [136.1, 272.2, 408.3], name: '۱۳۶.۱ هرتز · نوای کاسه تبتی (Om)', tag: 'سکون درون', desc: 'رزونانس زمین و مدیتیشن ریشه‌ای، مناسب بستن چشم‌ها و تنفس آگاهانه.'},
+];
+
+function FrequencyTuner({save}:{save:Save}){
+  const [activeFreq, setActiveFreq] = useState(FREQS[0]);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [volume, setVolume] = useState(0.4);
+  const [elapsed, setElapsed] = useState(0);
+  const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [id, setId] = useState(uid);
+
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const gainNodeRef = useRef<GainNode | null>(null);
+  const oscsRef = useRef<OscillatorNode[]>([]);
+  const timerRef = useRef<any>(null);
+
+  const cleanupAudio = useCallback(() => {
+    oscsRef.current.forEach(osc => {
+      try {
+        osc.stop();
+        osc.disconnect();
+      } catch {}
+    });
+    oscsRef.current = [];
+    if (timerRef.current) clearInterval(timerRef.current);
+  }, []);
+
+  const stopAudio = useCallback(() => {
+    if (gainNodeRef.current && audioCtxRef.current) {
+      try {
+        const now = audioCtxRef.current.currentTime;
+        gainNodeRef.current.gain.linearRampToValueAtTime(0.001, now + 0.3);
+        setTimeout(() => cleanupAudio(), 350);
+      } catch {
+        cleanupAudio();
+      }
+    } else {
+      cleanupAudio();
+    }
+    setIsPlaying(false);
+  }, [cleanupAudio]);
+
+  const startAudio = useCallback(async (freqData = activeFreq) => {
+    cleanupAudio();
+    try {
+      const AudioCtxClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (!audioCtxRef.current || audioCtxRef.current.state === 'closed') {
+        audioCtxRef.current = new AudioCtxClass();
+      }
+      if (audioCtxRef.current.state === 'suspended') {
+        await audioCtxRef.current.resume();
+      }
+      const ctx = audioCtxRef.current;
+      const masterGain = ctx.createGain();
+      masterGain.gain.setValueAtTime(0.001, ctx.currentTime);
+      masterGain.gain.linearRampToValueAtTime(volume, ctx.currentTime + 0.5);
+      masterGain.connect(ctx.destination);
+      gainNodeRef.current = masterGain;
+
+      const newOscs: OscillatorNode[] = [];
+
+      if (freqData.isBinaural) {
+        // Binaural beat: Left carrier, Right carrier + beat
+        const leftOsc = ctx.createOscillator();
+        const rightOsc = ctx.createOscillator();
+        leftOsc.type = 'sine';
+        rightOsc.type = 'sine';
+        leftOsc.frequency.setValueAtTime(freqData.hz, ctx.currentTime);
+        rightOsc.frequency.setValueAtTime(freqData.hz + (freqData.beatHz || 10), ctx.currentTime);
+
+        const merger = ctx.createChannelMerger(2);
+        leftOsc.connect(merger, 0, 0);
+        rightOsc.connect(merger, 0, 1);
+        merger.connect(masterGain);
+
+        leftOsc.start();
+        rightOsc.start();
+        newOscs.push(leftOsc, rightOsc);
+      } else if (freqData.harmonics) {
+        // Harmonics overtone series
+        freqData.harmonics.forEach((hHz, idx) => {
+          const osc = ctx.createOscillator();
+          const subGain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(hHz, ctx.currentTime);
+          const weight = idx === 0 ? 0.7 : idx === 1 ? 0.25 : 0.12;
+          subGain.gain.setValueAtTime(weight, ctx.currentTime);
+          osc.connect(subGain);
+          subGain.connect(masterGain);
+          osc.start();
+          newOscs.push(osc);
+        });
+      } else {
+        // Pure tone + soft octave
+        const mainOsc = ctx.createOscillator();
+        mainOsc.type = 'sine';
+        mainOsc.frequency.setValueAtTime(freqData.hz, ctx.currentTime);
+        mainOsc.connect(masterGain);
+        mainOsc.start();
+        newOscs.push(mainOsc);
+
+        if (freqData.subHz) {
+          const subOsc = ctx.createOscillator();
+          const subGain = ctx.createGain();
+          subOsc.type = 'sine';
+          subOsc.frequency.setValueAtTime(freqData.subHz, ctx.currentTime);
+          subGain.gain.setValueAtTime(0.2, ctx.currentTime);
+          subOsc.connect(subGain);
+          subGain.connect(masterGain);
+          subOsc.start();
+          newOscs.push(subOsc);
+        }
+      }
+
+      oscsRef.current = newOscs;
+      setIsPlaying(true);
+
+      timerRef.current = setInterval(() => {
+        setElapsed(e => e + 1);
+      }, 1000);
+    } catch (e) {
+      console.error('Web Audio error:', e);
+    }
+  }, [activeFreq, cleanupAudio, volume]);
+
+  useEffect(() => {
+    return () => {
+      cleanupAudio();
+      if (audioCtxRef.current && audioCtxRef.current.state !== 'closed') {
+        try { audioCtxRef.current.close(); } catch {}
+      }
+    };
+  }, [cleanupAudio]);
+
+  function handleVolumeChange(val: number) {
+    setVolume(val);
+    if (gainNodeRef.current && audioCtxRef.current && isPlaying) {
+      gainNodeRef.current.gain.linearRampToValueAtTime(val, audioCtxRef.current.currentTime + 0.1);
+    }
+  }
+
+  function handleSelectFreq(f: typeof FREQS[0]) {
+    setActiveFreq(f);
+    if (isPlaying) {
+      void startAudio(f);
+    }
+  }
+
+  async function store() {
+    if (saved || saving || elapsed < 5) return;
+    setSaving(true);
+    try {
+      const ok = await save(newRecord('frequency', id, {
+        after: `شنیدن فرکانس ${activeFreq.name} به مدت ${n(Math.round(elapsed / 60) || 1)} دقیقه`,
+        seconds: elapsed
+      }));
+      setSaved(ok);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="gx-grid-two">
+      <div>
+        <h3>مولد ارتعاش و فرکانس‌های درونی</h3>
+        <p className="gx-help">
+          صوت‌های سینوسی خالص بدون نیاز به اینترنت و مستقیماً توسط پردازنده صوتی مرورگر ساخته می‌شوند. برای اثرگذاری بهتر از هندزفری استفاده کنید.
+        </p>
+
+        <div className="gx-freq-list">
+          {FREQS.map(f => (
+            <button
+              key={f.id}
+              type="button"
+              className={`gx-freq-card ${activeFreq.id === f.id ? 'is-active' : ''}`}
+              onClick={() => handleSelectFreq(f)}
+            >
+              <div className="gx-freq-head">
+                <strong>{f.name}</strong>
+                <span className="g-tag">{f.tag}</span>
+              </div>
+              <p>{f.desc}</p>
+            </button>
+          ))}
+        </div>
+
+        <div className="gx-freq-controls">
+          <div className="gx-volume-slider">
+            <Volume2 size={18}/>
+            <input
+              type="range"
+              min="0.05"
+              max="1"
+              step="0.05"
+              value={volume}
+              onChange={e => handleVolumeChange(parseFloat(e.target.value))}
+              aria-label="بلندی صدا"
+            />
+          </div>
+
+          <div className="gx-actions">
+            {isPlaying ? (
+              <button type="button" className="g-btn danger" onClick={stopAudio}>
+                <Pause size={17}/> توقف پخش
+              </button>
+            ) : (
+              <button type="button" className="g-btn primary" onClick={() => void startAudio()}>
+                <Play size={17}/> شروع پخش فرکانس
+              </button>
+            )}
+
+            {elapsed >= 10 && (
+              <button type="button" className="g-btn" disabled={saving || saved} onClick={() => void store()}>
+                <Check size={16}/> {saved ? 'ثبت شد' : saving ? 'در حال ثبت…' : 'ثبت در تاریخچه'}
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="gx-stage gx-freq-stage">
+        <div className={`gx-freq-visualizer ${isPlaying ? 'is-playing' : ''}`}>
+          <div className="gx-freq-ring r1" />
+          <div className="gx-freq-ring r2" />
+          <div className="gx-freq-ring r3" />
+          <div className="gx-freq-center">
+            <Radio size={36} className="gx-freq-center-icon" />
+            <strong>{activeFreq.name.split('·')[0]}</strong>
+            <small>{isPlaying ? `${n(Math.floor(elapsed / 60))}:${n(elapsed % 60).padStart(2, '۰')}` : 'در حال سکوت'}</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────
+   NEW GADGET: Shadow Work Mirror (Carl Jung Self-Integration)
+   ───────────────────────────────────────────────────────────── */
+function ShadowWork({save, seed}:{save:Save; seed:GadgetRecord|null}){
+  const [trigger, setTrigger] = useState(seed?.before || '');
+  const [reflection, setReflection] = useState(seed?.after || '');
+  const [integration, setIntegration] = useState(seed?.note || '');
+  const [step, setStep] = useState(0);
+  const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [id, setId] = useState(uid);
+  const [error, setError] = useState('');
+  const pending = useRef(false);
+
+  const presets = [
+    'غرور و خودنمایی دیگران',
+    'بی‌مسئولیتی و راحت‌طلبی',
+    'قضاوت‌گری و عیب‌جویی',
+    'تندخویی و پرخاشگری',
+    'بی‌توجهی و نادیده گرفتن من',
+    'حسادت یا پنهان‌کاری'
+  ];
+
+  async function store() {
+    if (pending.current || saved) return;
+    if (!trigger.trim() || !reflection.trim()) {
+      setError('لطفاً رفتار محرک و ریشه درونی را بنویسید.');
+      return;
+    }
+    pending.current = true;
+    setSaving(true);
+    setError('');
+    try {
+      const ok = await save(newRecord('shadow', id, {
+        before: trigger.trim(),
+        after: reflection.trim(),
+        note: integration.trim() ? `مرز سالم و صلح درون: ${integration.trim()}` : 'پذیرش و یکپارچه‌سازی سایه با شفقت'
+      }));
+      setSaved(ok);
+      if (!ok) setError('ثبت انجام نشد؛ اطلاعات در همین صفحه باقی مانده است.');
+    } finally {
+      pending.current = false;
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="gx-grid-two">
+      <div className="gx-shadow-flow">
+        {step === 0 && (
+          <div className="gx-shadow-step">
+            <span className="gx-step-badge">مرحله ۱ از ۳ · مشاهده محرک بیرونی</span>
+            <h3>چه رفتاری در دیگران تو را به شدت آزار می‌دهد یا خشمت را برمی‌انگیزد؟</h3>
+            <p className="gx-help">
+              طبق روان‌شناسی تحلیلی یونگ، آنچه در دیگری به شدت ما را می‌آزارد، یا بخشی سرکوب‌شده از روان خود ماست که به آن اجازه حضور نداده‌ایم، یا مرزی است که باید قاطعانه و بدون خشم برای خود وضع کنیم.
+            </p>
+            <div className="gx-pills-row">
+              {presets.map(p => (
+                <button
+                  key={p}
+                  type="button"
+                  className={`gx-pill ${trigger.includes(p) ? 'is-active' : ''}`}
+                  onClick={() => setTrigger(t => t ? `${t} - ${p}` : p)}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
+            <label className="g-field">
+              توصیف رفتار محرک
+              <textarea
+                rows={3}
+                maxLength={1200}
+                value={trigger}
+                placeholder="مثلاً: وقتی فردی در جمع با تکبر فقط از خودش تعریف می‌کند و به دیگران اهمیت نمی‌دهد..."
+                onChange={e => setTrigger(e.target.value)}
+              />
+            </label>
+            <div className="gx-actions">
+              <button
+                type="button"
+                className="g-btn primary"
+                disabled={!trigger.trim()}
+                onClick={() => setStep(1)}
+              >
+                مرحله بعد: چرخش آینه به درون <ArrowLeft size={16}/>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {step === 1 && (
+          <div className="gx-shadow-step">
+            <span className="gx-step-badge">مرحله ۲ از ۳ · ریشه و سایه پنهان</span>
+            <h3>اگر این رفتار یک آینه باشد، چه پیامی برای نیازهای پنهان تو دارد؟</h3>
+            <p className="gx-help">
+              از خودت بپرس: «آیا من به خودم اجازه دیده‌شدن، استراحت، یا بیان شفاف نیازهایم را نمی‌دهم و چون خودم را در قفس گذاشته‌ام، از رهایی دیگری عصبانی می‌شوم؟»
+            </p>
+            <label className="g-field">
+              کشف ریشه درونی
+              <textarea
+                rows={4}
+                maxLength={1200}
+                value={reflection}
+                placeholder="مثلاً: متوجه شدم من همیشه سعی کرده‌ام متواضعِ بیش از حد باشم و از دیده‌شدن ترسیده‌ام. خشم من به خاطر نیازی است که در خودم سرکوب کرده‌ام..."
+                onChange={e => setReflection(e.target.value)}
+              />
+            </label>
+            <div className="gx-actions">
+              <button
+                type="button"
+                className="g-btn primary"
+                disabled={!reflection.trim()}
+                onClick={() => setStep(2)}
+              >
+                مرحله بعد: شفقت و صلح درون <ArrowLeft size={16}/>
+              </button>
+              <button type="button" className="g-text-btn" onClick={() => setStep(0)}>بازگشت به مرحله قبل</button>
+            </div>
+          </div>
+        )}
+
+        {step === 2 && (
+          <div className="gx-shadow-step">
+            <span className="gx-step-badge">مرحله ۳ از ۳ · یکپارچه‌سازی و مرز سالم</span>
+            <h3>چگونه با شفقت این بخش را در آغوش بگیری و مرز سالم بسازی؟</h3>
+            <p className="gx-help">
+              یک جمله صلح با خود و تصمیمی برای مراقبت از روانت بنویس.
+            </p>
+            <label className="g-field">
+              پیام صلح و اقدام من
+              <textarea
+                rows={3}
+                maxLength={1200}
+                value={integration}
+                placeholder="من حق دارم توانمندی‌هایم را با اعتماد به نفس ابراز کنم و به رفتارهای آسیب‌زننده دیگران واکنش هیجانی نشان ندهم."
+                onChange={e => setIntegration(e.target.value)}
+              />
+            </label>
+            <div className="gx-actions">
+              <button
+                type="button"
+                className="g-btn primary"
+                disabled={saving || saved}
+                onClick={() => void store()}
+              >
+                <Sparkles size={16}/>
+                {saved ? 'در تاریخچه خودشناسی ثبت شد' : saving ? 'در حال ثبت…' : 'یکپارچه‌سازی و ثبت در تاریخچه'}
+              </button>
+              <button
+                type="button"
+                className="g-btn"
+                onClick={() => { setStep(0); setTrigger(''); setReflection(''); setIntegration(''); setSaved(false); setId(uid()); }}
+              >
+                <RotateCcw size={16}/> تمرین جدید
+              </button>
+            </div>
+          </div>
+        )}
+        {error && <p className="gx-inline-status" role="alert">{error}</p>}
+      </div>
+
+      <div className="gx-stage gx-shadow-stage">
+        <div className={`gx-shadow-mirror ${step === 2 ? 'is-integrated' : step === 1 ? 'is-reflecting' : ''}`}>
+          <div className="gx-mirror-frame">
+            <Flame size={44} className="gx-mirror-icon" />
+            <div className="gx-mirror-text">
+              <strong>{step === 0 ? 'آینه سایه' : step === 1 ? 'انعکاس درون' : 'نور یکپارچگی'}</strong>
+              <p>
+                {step === 0
+                  ? (trigger || 'محرک بیرونی، دریچه‌ای به شناخت ناخودآگاه است.')
+                  : step === 1
+                  ? (reflection || 'دیدن سایه، آغاز رهایی از خشم‌های ناخواسته است.')
+                  : (integration || '«تاریکی تا زمانی که به آگاهی تبدیل نشود، بر زندگی تو حکومت خواهد کرد.» — کارل یونگ')}
+              </p>
+            </div>
+          </div>
+          {saved && <span className="g-tag"><Check size={14}/>ثبت شد</span>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────
+   NEW GADGET: Surrender Box (صندوق توکل و رهایی از کنترل)
+   ───────────────────────────────────────────────────────────── */
+function SurrenderBox({save, effects}:{save:Save; effects:boolean}){
+  const [worry, setWorry] = useState('');
+  const [category, setCategory] = useState('نتیجه و آینده');
+  const [phase, setPhase] = useState<'idle' | 'surrendering' | 'locked'>('idle');
+  const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [id, setId] = useState(uid);
+  const [error, setError] = useState('');
+
+  const categories = ['نتیجه و آینده', 'قضاوت یا رفتار دیگران', 'رویدادهای گذشته', 'مسائل خارج از کنترل'];
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!worry.trim() || phase !== 'idle') return;
+    setPhase('surrendering');
+    setSaving(true);
+    setError('');
+
+    setTimeout(async () => {
+      try {
+        const ok = await save(newRecord('surrender', id, {
+          before: worry.trim(),
+          after: 'دغدغه به صندوق توکل و جریان هستی سپرده شد.',
+          note: `دسته: ${category}`
+        }));
+        setSaved(ok);
+        setPhase('locked');
+      } catch {
+        setError('خطا در ثبت؛ دغدغه شما محفوظ است.');
+        setPhase('idle');
+      } finally {
+        setSaving(false);
+      }
+    }, effects ? 1000 : 200);
+  }
+
+  return (
+    <div className="gx-grid-two">
+      <div>
+        <h3>صندوق توکل و رهایی از وسواس کنترل</h3>
+        <p className="gx-help">
+          انرژی روانی خود را فقط صرف کارهایی کنید که در دایره کنترل شماست. نتیجه نهایی، رفتار دیگران و آینده را به صندوق امن توکل بسپارید و با خیالی آسوده ادامه دهید.
+        </p>
+
+        {phase === 'locked' ? (
+          <div className="gx-surrender-done">
+            <p className="gx-help">
+              این دغدغه با آرامش به صندوق سپرده شد. لازم نیست بارها و بارها در ذهنت مرورش کنی.
+            </p>
+            <button
+              type="button"
+              className="g-btn"
+              onClick={() => { setPhase('idle'); setWorry(''); setSaved(false); setId(uid()); }}
+            >
+              <RotateCcw size={16}/> سپردن دغدغه‌ای دیگر
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={submit}>
+            <div className="gx-pills-row">
+              {categories.map(cat => (
+                <button
+                  key={cat}
+                  type="button"
+                  className={`gx-pill ${category === cat ? 'is-active' : ''}`}
+                  onClick={() => setCategory(cat)}
+                  disabled={phase !== 'idle'}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            <label className="g-field">
+              چه موضوع یا نتیجه‌ای را هرچه تلاش می‌کنی از اختیارت خارج است؟
+              <textarea
+                rows={4}
+                required
+                maxLength={1200}
+                value={worry}
+                disabled={phase !== 'idle'}
+                placeholder="مثلاً: نتیجه آزمون، اینکه فلان شخص چه تصمیمی می‌گیرد، یا نگرانی از اتفاقات آینده..."
+                onChange={e => setWorry(e.target.value)}
+              />
+            </label>
+
+            <div className="gx-actions">
+              <button
+                type="submit"
+                className="g-btn primary"
+                disabled={!worry.trim() || saving || phase !== 'idle'}
+              >
+                <Archive size={17}/>
+                {saving ? 'در حال بستن و سپردن صندوق…' : 'سپردن به صندوق توکل'}
+              </button>
+            </div>
+            {error && <p className="gx-inline-status" role="alert">{error}</p>}
+          </form>
+        )}
+      </div>
+
+      <div className="gx-stage gx-surrender-stage">
+        <div className={`gx-surrender-box is-${phase}`}>
+          <div className="gx-box-lid">
+            <Archive size={42} className="gx-box-icon" />
+          </div>
+          <div className="gx-box-body">
+            {phase === 'locked' ? (
+              <div className="gx-box-locked-msg">
+                <Lock size={32} />
+                <strong>در امن‌ترین دست‌ها</strong>
+                <p>«من سهم تلاشم را انجام می‌دهم و بار نتیجه را با آرامش زمین می‌گذارم.»</p>
+              </div>
+            ) : (
+              <div className="gx-box-open-msg">
+                <span>{worry ? `«${worry.slice(0, 70)}${worry.length > 70 ? '…' : ''}»` : 'در صندوق باز است...'}</span>
+              </div>
+            )}
+          </div>
+          {saved && <span className="g-tag"><Check size={14}/>سپرده شد</span>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const senses=[{number:5,title:'پنج چیز که می‌بینی',prompt:'نگاهت را آرام بچرخان؛ رنگ‌ها، شکل‌ها یا نور را ببین.'},{number:4,title:'چهار چیز که حس می‌کنی',prompt:'مثلاً تماس پا با زمین، لباس روی پوست یا تکیه‌گاه صندلی.'},{number:3,title:'سه صدایی که می‌شنوی',prompt:'یک صدای نزدیک، یک صدای دور؛ بدون نیاز به قضاوت.'},{number:2,title:'دو بویی که متوجه می‌شوی',prompt:'اگر بویی نیست، دو بوی خوشایند را به یاد بیاور.'},{number:1,title:'یک مزه یا یک چیز دلنشین',prompt:'یک مزه را حس یا تصور کن؛ یا یک چیز کوچک و دلنشین را نام ببر.'}];
 function Grounding({save}:{save:Save}){
   const [step,setStep]=useState(0),[answers,setAnswers]=useState(['','','','','']),[saved,setSaved]=useState(false),[saving,setSaving]=useState(false),[id,setId]=useState(uid),[error,setError]=useState('');const pending=useRef(false);
@@ -154,5 +911,5 @@ function BodyPause({save}:{save:Save}){
 function Gratitude({save}:{save:Save}){
   const [items,setItems]=useState(['','','']),[saved,setSaved]=useState(false),[saving,setSaving]=useState(false),[id,setId]=useState(uid),[error,setError]=useState('');const pending=useRef(false);
   async function submit(e:React.FormEvent){e.preventDefault();if(pending.current||saved)return;pending.current=true;setSaving(true);try{const ok=await save(newRecord('gratitude',id,{after:'سه نقطه روشن امروز من',note:items.map((item,i)=>`${n(i+1)}. ${item.trim()}`).join('\n')}));setSaved(ok);if(!ok)setError('کارت ثبت نشد؛ نوشته‌هایت اینجا مانده‌اند.')}finally{pending.current=false;setSaving(false)}}
-  return <div className="gx-grid-two"><form onSubmit={submit}><p className="gx-help">لازم نیست روز خوبی بوده باشد. یک لحظه کوچک، یک آدم یا چیزی که برایت ارزش داشت کافی است.</p>{['یک چیز کوچک که خوشحالم کرد','یک همراهی یا مهربانی','چیزی که در خودم ارزشمند می‌بینم'].map((label,i)=><label className="g-field" key={label}>{n(i+1)}. {label}<textarea required rows={2} maxLength={1200} value={items[i]} disabled={saved||saving} onChange={e=>setItems(values=>values.map((value,index)=>i===index?e.target.value:value))}/></label>)}<div className="gx-actions"><button className="g-btn primary" disabled={saving||saved||items.some(item=>!item.trim())}><Heart size={17}/>{saved?'کارت در تاریخچه ماند':saving?'در حال ثبت…':'نگهداری این سه لحظه'}</button>{saved&&<button className="g-btn" type="button" onClick={()=>{setItems(['','','']);setSaved(false);setId(uid());setError('')}}>یک کارت تازه</button>}</div>{error&&<p className="gx-inline-status" role="alert">{error}</p>}</form><div className="gx-stage gx-gratitude-stack">{items.map((item,i)=><div className="gx-gratitude-note" key={i}><span>{['✦','♡','☀'][i]}</span><p>{item||['یک اتفاق کوچک…','یک مهربانی…','یک توانایی در من…'][i]}</p></div>)}{saved&&<span className="g-tag"><Check size={14}/>ثبت شد</span>}</div></div>;
+  return <div className="gx-grid-two"><form onSubmit={submit}><p className="gx-help">لازم نیست روز خوبی بوده باشد. یک لحظه کوچک، یک همراهی یا چیزی که برایت ارزش داشت کافی است.</p>{['یک چیز کوچک که خوشحالم کرد','یک همراهی یا مهربانی','چیزی که در خودم ارزشمند می‌بینم'].map((label,i)=><label className="g-field" key={label}>{n(i+1)}. {label}<textarea required rows={2} maxLength={1200} value={items[i]} disabled={saved||saving} onChange={e=>setItems(values=>values.map((value,index)=>i===index?e.target.value:value))}/></label>)}<div className="gx-actions"><button className="g-btn primary" disabled={saving||saved||items.some(item=>!item.trim())}><Heart size={17}/>{saved?'کارت در تاریخچه ماند':saving?'در حال ثبت…':'نگهداری این سه لحظه'}</button>{saved&&<button className="g-btn" type="button" onClick={()=>{setItems(['','','']);setSaved(false);setId(uid());setError('')}}>یک کارت تازه</button>}</div>{error&&<p className="gx-inline-status" role="alert">{error}</p>}</form><div className="gx-stage gx-gratitude-stack">{items.map((item,i)=><div className="gx-gratitude-note" key={i}><span>{['✦','♡','☀'][i]}</span><p>{item||['یک اتفاق کوچک…','یک مهربانی…','یک توانایی در من…'][i]}</p></div>)}{saved&&<span className="g-tag"><Check size={14}/>ثبت شد</span>}</div></div>;
 }

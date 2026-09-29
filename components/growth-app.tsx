@@ -2,7 +2,7 @@
 
 import {useCallback, useEffect, useRef, useState} from 'react';
 import dynamic from 'next/dynamic';
-import {Gamepad2, MessageCircle, Newspaper} from 'lucide-react';
+import {Gamepad2, MessageCircle, Newspaper, Tv} from 'lucide-react';
 import {destinations,readPreferences,type Destination} from '@/lib/product';
 import {DiscoveryDeck,FavoritesRail,GlobalSearch,NotificationCenter,Personalization,Onboarding,UsageSignal,ModuleSkeleton,ModuleBoundary} from '@/components/super-shell';
 import {Activity, ArrowLeft, ArrowRight, BookOpen, CalendarDays, Check, ChevronLeft, ChevronRight, CircleHelp, Clock3, Download, Flame, Flower2, Focus, Heart, LayoutDashboard, Leaf, Menu, MoreHorizontal, Pencil, Plus, Search, Settings, ShieldCheck, Sparkles, Sprout, Target, Trash2, TrendingUp, Upload, WifiOff, X} from 'lucide-react';
@@ -29,10 +29,11 @@ const LanguageHub=dynamic(()=>import('@/components/language-hub'),{loading:Modul
 const MeditationHub=dynamic(()=>import('@/components/meditation-hub'),{loading:ModuleSkeleton});
 const WorkoutHub=dynamic(()=>import('@/components/workout-hub'),{loading:ModuleSkeleton});
 const SelfDiscoveryHub=dynamic(()=>import('@/components/self-discovery-hub'),{loading:ModuleSkeleton});
+const LiveTV=dynamic(()=>import('@/components/live-tv'),{loading:ModuleSkeleton});
 type Edit = {type:'task';value:Task}|{type:'goal';value:Goal}|{type:'habit';value:Habit}|{type:'journal';value:JournalEntry}|{type:'resource';value:Resource}|null;
 const navigation: {id:Tab;label:string;icon:typeof Leaf}[] = [
   {id:'companion',label:'همراه',icon:Sparkles},{id:'journeys',label:'مسیرهای رشد',icon:Sprout},{id:'projects',label:'کارگاه پروژه',icon:Target},{id:'reflection',label:'آینه شخصی',icon:Heart},{id:'trust',label:'مرکز اعتماد',icon:ShieldCheck},{id:'overview',label:'نمای کلاسیک',icon:LayoutDashboard},
-  {id:'home',label:'خانه',icon:LayoutDashboard},{id:'community',label:'گفتگو',icon:MessageCircle},{id:'markets',label:'اخبار و بازار',icon:Newspaper},{id:'games',label:'بازی',icon:Gamepad2},{id:'planner',label:'برنامه‌ریزی',icon:CalendarDays},{id:'goals',label:'هدف‌های من',icon:Target},
+  {id:'home',label:'خانه',icon:LayoutDashboard},{id:'community',label:'گفتگو',icon:MessageCircle},{id:'markets',label:'اخبار و بازار',icon:Newspaper},{id:'tv',label:'تلویزیون زنده',icon:Tv as any},{id:'games',label:'بازی',icon:Gamepad2},{id:'planner',label:'برنامه‌ریزی',icon:CalendarDays},{id:'goals',label:'هدف‌های من',icon:Target},
   {id:'habits',label:'عادت‌های کوچک',icon:Flame},{id:'journal',label:'دفتر خودشناسی',icon:BookOpen},{id:'wheel',label:'چرخه زندگی',icon:Flower2},
   {id:'focus',label:'زمان تمرکز',icon:Focus},{id:'insights',label:'گزارش رشد',icon:TrendingUp},{id:'library',label:'کتابخانه رشد',icon:Sprout},
   {id:'self-discovery',label:'خودشناسی و خداشناسی',icon:Sparkles},{id:'meditation',label:'مدیتیشن',icon:Flower2},{id:'workout',label:'ورزش روزانه',icon:Activity},{id:'gadgets',label:'گجت',icon:Sparkles},{id:'language',label:'زبان‌آموز',icon:BookOpen},
@@ -95,6 +96,7 @@ export default function GrowthApp(){
    {tab==='trust'&&<ModuleBoundary key="trust"><Trust data={data} update={update} go={go} notify={notify} today={today}/></ModuleBoundary>}
    {tab==='community'&&<ModuleBoundary key="community"><CommunityHub/></ModuleBoundary>}
    {tab==='markets'&&<ModuleBoundary key="markets"><MarketHub/></ModuleBoundary>}
+   {tab==='tv'&&<ModuleBoundary key="tv"><LiveTV/></ModuleBoundary>}
    {tab==='language'&&<ModuleBoundary key="language"><LanguageHub/></ModuleBoundary>}
    {tab==='meditation'&&<ModuleBoundary key="meditation"><MeditationHub/></ModuleBoundary>}
    {tab==='workout'&&<ModuleBoundary key="workout"><WorkoutHub/></ModuleBoundary>}

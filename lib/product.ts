@@ -9,6 +9,7 @@ export const destinations = [
   {id:'community',label:'گفتگو',group:'کشف و ارتباط',description:'آدم‌ها، گروه‌ها و گفتگوهای تازه'},
   {id:'markets',label:'اخبار و بازار',group:'کشف و ارتباط',description:'خبرها، قیمت‌ها و فهرست پیگیری'},
   {id:'language',label:'زبان‌آموز',group:'کشف و ارتباط',description:'آموزش و تمرین روزانه زبان انگلیسی'},
+  {id:'tv',label:'تلویزیون زنده',group:'کشف و ارتباط',description:'پخش زنده شبکه‌های سراسری، ورزشی و مستند'},
   {id:'games',label:'بازی',group:'کشف و ارتباط',description:'بازی‌های فکری و رقابت دوستانه'},
   {id:'planner',label:'برنامه‌ریزی',group:'روز من',description:'کارها و برنامه روزانه'},
   {id:'goals',label:'هدف‌های من',group:'روز من',description:'قدم بعدی و مسیر هدف‌ها'},

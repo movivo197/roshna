@@ -7,6 +7,7 @@ import {
   Flame, Play, Brain, Star, ArrowLeft, Globe, Zap
 } from 'lucide-react';
 import { DailyLesson, LanguageProfile, languageProfileSchema, dailyLessonSchema } from '@/lib/language/types';
+import { getCurriculumLesson } from '@/lib/language/curriculum';
 import styles from './language.module.css';
 
 const PROFILE_KEY = 'roshana-language-profile-v1';
@@ -79,7 +80,14 @@ export default function LanguageHub() {
       setLesson(parsed);
       localStorage.setItem(LESSON_KEY, JSON.stringify(parsed));
     } catch {
-      setError('اتصال به هوش مصنوعی برقرار نشد. دوباره تلاش کنید.');
+      // Offline or network error: instantly fall back to rich curated curriculum
+      try {
+        const fallback = getCurriculumLesson(p.level);
+        setLesson(fallback);
+        localStorage.setItem(LESSON_KEY, JSON.stringify(fallback));
+      } catch {
+        setError('خطا در بارگذاری درس. لطفاً دوباره تلاش کنید.');
+      }
     } finally {
       setLoading(false);
     }

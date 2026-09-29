@@ -101,7 +101,7 @@ function uniqueIds<T extends { id: string }>(items: T[]): boolean {
 
 export const gadgetRecordSchema = z.object({
   id: idSchema,
-  kind: z.enum(['reframe', 'release', 'breathing', 'grounding', 'body', 'gratitude']),
+  kind: z.enum(['reframe', 'release', 'breathing', 'grounding', 'body', 'gratitude', 'shadow', 'frequency', 'surrender', 'breathe478']),
   createdAt: z.string().datetime(),
   before: z.string().max(1500),
   after: z.string().max(1500),

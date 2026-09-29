@@ -41,8 +41,24 @@ export async function sessionAction(request: Request): Promise<Response> {
 }
 
 export async function updateProfile(request: Request): Promise<Response> {
-  const member = requireMember(request); const input = z.object({ displayName: name, bio: z.string().trim().max(240) }).strict().parse(await readJson(request));
-  getDb().prepare('UPDATE members SET display_name=?,bio=? WHERE id=?').run(input.displayName, input.bio, member.id);
+  const member = requireMember(request);
+  const input = z.object({
+    displayName: name,
+    bio: z.string().trim().max(240).default(''),
+    avatar: z.string().trim().max(2000).optional(),
+    gender: z.enum(['male', 'female', 'other', 'unspecified']).optional(),
+    age: z.number().int().min(0).max(120).optional(),
+  }).strict().parse(await readJson(request));
+
+  getDb().prepare('UPDATE members SET display_name=?, bio=?, avatar=?, gender=?, age=? WHERE id=?')
+    .run(
+      input.displayName,
+      input.bio,
+      input.avatar || member.avatar || '',
+      input.gender || member.gender || 'unspecified',
+      input.age ?? member.age ?? 0,
+      member.id
+    );
   return json({ user: publicMember(getDb().prepare('SELECT * FROM members WHERE id=?').get(member.id)!) });
 }
 
@@ -283,3 +299,145 @@ export async function accountAction(request: Request): Promise<Response> {
   });
   return json({ ok: true }, 200, { 'Set-Cookie': revokeMemberSession(request) });
 }
+
+export async function anonymousAction(request: Request): Promise<Response> {
+  const member = requireMember(request);
+  const db = getDb();
+
+  // Validate required profile fields for anonymous chat
+  if (!member.gender || member.gender === 'unspecified' || !member.age || member.age < 12 || member.displayName.trim().length < 2) {
+    throw new HttpError(400, 'برای ورود به چت ناشناس، تکمیل نام، جنسیت و سن در پروفایل الزامی است.');
+  }
+
+  const input = z.discriminatedUnion('action', [
+    z.object({
+      action: z.literal('find'),
+      preferredGender: z.enum(['any', 'male', 'female']),
+    }).strict(),
+    z.object({
+      action: z.literal('leave'),
+      roomId: idSchema.optional(),
+      queueId: idSchema.optional(),
+    }).strict(),
+    z.object({
+      action: z.literal('reveal'),
+      roomId: idSchema,
+    }).strict(),
+  ]).parse(await readJson(request));
+
+  if (input.action === 'leave') {
+    if (input.queueId) {
+      db.prepare("UPDATE anonymous_queue SET status='cancelled' WHERE id=? AND member_id=?").run(input.queueId, member.id);
+    }
+    if (input.roomId) {
+      db.prepare("INSERT INTO community_messages(id,room_id,author_id,body,created_at) VALUES(?,?,?,?,?)")
+        .run(id(), input.roomId, member.id, 'هم‌صحبت شما گفتگو را ترک کرد.', now());
+    }
+    return json({ ok: true });
+  }
+
+  if (input.action === 'reveal') {
+    const genderLabel = member.gender === 'male' ? 'پسر' : member.gender === 'female' ? 'دختر' : '';
+    const bodyText = `✨ هم‌صحبت شما مایل به آشنایی است: «${member.displayName}» (${genderLabel}${member.age ? `، ${member.age} ساله` : ''})`;
+    db.prepare("INSERT INTO community_messages(id,room_id,author_id,body,created_at) VALUES(?,?,?,?,?)")
+      .run(id(), input.roomId, member.id, bodyText, now());
+    return json({ ok: true });
+  }
+
+  if (input.action === 'find') {
+    db.prepare("UPDATE anonymous_queue SET status='cancelled' WHERE member_id=? AND status='waiting'").run(member.id);
+
+    const query = `
+      SELECT q.*, m.display_name, m.gender AS peer_gender, m.age AS peer_age, m.avatar AS peer_avatar
+      FROM anonymous_queue q
+      JOIN members m ON m.id = q.member_id AND m.suspended = 0
+      WHERE q.status = 'waiting'
+        AND q.member_id <> ?
+        AND (q.preferred_gender = 'any' OR q.preferred_gender = ?)
+        AND (? = 'any' OR m.gender = ?)
+        AND NOT EXISTS(SELECT 1 FROM member_blocks b WHERE (b.blocker_id=? AND b.blocked_id=m.id) OR (b.blocker_id=m.id AND b.blocked_id=?))
+      ORDER BY q.created_at ASC LIMIT 1
+    `;
+
+    const candidate = db.prepare(query).get(
+      member.id,
+      member.gender,
+      input.preferredGender,
+      input.preferredGender,
+      member.id,
+      member.id
+    ) as any;
+
+    if (candidate) {
+      const roomId = 'anon_' + id();
+      const time = now();
+      transaction(() => {
+        db.prepare("INSERT INTO community_rooms(id,kind,name,owner_id,dm_key,created_at,updated_at) VALUES(?,'dm',?,NULL,?, ?, ?)")
+          .run(roomId, 'گفتگوی ناشناس', 'anon:' + roomId, time, time);
+
+        db.prepare("INSERT INTO community_memberships(room_id,member_id) VALUES(?,?),(?,?)")
+          .run(roomId, member.id, roomId, candidate.member_id);
+
+        db.prepare("UPDATE anonymous_queue SET status='matched', room_id=? WHERE id=?")
+          .run(roomId, candidate.id);
+
+        const peerLabel = candidate.peer_gender === 'male' ? 'پسر' : candidate.peer_gender === 'female' ? 'دختر' : 'هم‌صحبت';
+        const welcomeText = `🌱 اتصال برقرار شد! هم‌صحبت شما یک ${peerLabel} ${candidate.peer_age ? `${candidate.peer_age} ساله` : ''} است. پیام خود را با احترام بفرستید.`;
+        db.prepare("INSERT INTO community_messages(id,room_id,author_id,body,created_at) VALUES(?,?,?,?,?)")
+          .run(id(), roomId, candidate.member_id, welcomeText, time);
+      });
+
+      return json({
+        status: 'matched',
+        roomId,
+        peer: {
+          gender: candidate.peer_gender,
+          age: candidate.peer_age,
+        },
+      });
+    }
+
+    const queueId = id();
+    db.prepare("INSERT INTO anonymous_queue(id,member_id,gender,preferred_gender,status,created_at) VALUES(?,?,?,?,'waiting',?)")
+      .run(queueId, member.id, member.gender, input.preferredGender, now());
+
+    return json({
+      status: 'waiting',
+      queueId,
+    });
+  }
+
+  throw new HttpError(400, 'عملیات نامعتبر است.');
+}
+
+export async function anonymousPoll(request: Request): Promise<Response> {
+  const member = requireMember(request);
+  const queueId = new URL(request.url).searchParams.get('queueId');
+  if (!queueId) throw new HttpError(400, 'شناسه صف ارسال نشده است.');
+
+  const db = getDb();
+  const row = db.prepare("SELECT * FROM anonymous_queue WHERE id=? AND member_id=?").get(queueId, member.id) as any;
+  if (!row) throw new HttpError(404, 'نوبت در صف پیدا نشد.');
+
+  if (row.status === 'matched' && row.room_id) {
+    const peerRow = db.prepare(`
+      SELECT m.gender, m.age
+      FROM community_memberships cm
+      JOIN members m ON m.id = cm.member_id
+      WHERE cm.room_id = ? AND cm.member_id <> ?
+    `).get(row.room_id, member.id) as any;
+
+    return json({
+      status: 'matched',
+      roomId: row.room_id,
+      peer: peerRow ? { gender: peerRow.gender, age: peerRow.age } : null,
+    });
+  }
+
+  if (row.status === 'cancelled') {
+    return json({ status: 'cancelled' });
+  }
+
+  return json({ status: 'waiting' });
+}
+

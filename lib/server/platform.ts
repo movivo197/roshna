@@ -47,7 +47,12 @@ export function getDb(): DatabaseSync {
     CREATE INDEX IF NOT EXISTS platform_notifications_member ON platform_notifications(member_id,created_at DESC);
     CREATE TABLE IF NOT EXISTS community_audit (id TEXT PRIMARY KEY, action TEXT NOT NULL, target_id TEXT NOT NULL, created_at TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS member_vaults (member_id TEXT PRIMARY KEY REFERENCES members(id) ON DELETE CASCADE, revision INTEGER NOT NULL, envelope TEXT, updated_at TEXT NOT NULL);
+    CREATE TABLE IF NOT EXISTS anonymous_queue (id TEXT PRIMARY KEY, member_id TEXT NOT NULL REFERENCES members(id) ON DELETE CASCADE, gender TEXT NOT NULL, preferred_gender TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'waiting', room_id TEXT, created_at TEXT NOT NULL);
+    CREATE INDEX IF NOT EXISTS anonymous_queue_status ON anonymous_queue(status, created_at);
   `);
+  try { db.exec('ALTER TABLE members ADD COLUMN avatar TEXT DEFAULT ""'); } catch {}
+  try { db.exec('ALTER TABLE members ADD COLUMN gender TEXT DEFAULT "unspecified"'); } catch {}
+  try { db.exec('ALTER TABLE members ADD COLUMN age INTEGER DEFAULT 0'); } catch {}
   const now = new Date().toISOString();
   db.prepare("INSERT OR IGNORE INTO community_rooms(id,kind,name,created_at,updated_at) VALUES('public-lobby','public','گفتگوی عمومی',?,?)").run(now, now);
   state.__roshanaPlatformDb = db;
@@ -64,7 +69,19 @@ export function transaction<T>(work: () => T): T {
 
 export function publicMember(row: Record<string, unknown>): Member {
   const xp = Number(row.xp || 0);
-  return { id: String(row.id), username: String(row.username), displayName: String(row.display_name), bio: String(row.bio || ''), xp, level: Math.floor(Math.sqrt(Math.max(0, xp) / 25)) + 1, createdAt: String(row.created_at), lastSeenAt: String(row.last_seen_at) };
+  return {
+    id: String(row.id),
+    username: String(row.username),
+    displayName: String(row.display_name),
+    bio: String(row.bio || ''),
+    avatar: String(row.avatar || ''),
+    gender: (row.gender as any) || 'unspecified',
+    age: Number(row.age || 0),
+    xp,
+    level: Math.floor(Math.sqrt(Math.max(0, xp) / 25)) + 1,
+    createdAt: String(row.created_at),
+    lastSeenAt: String(row.last_seen_at),
+  };
 }
 
 function tokenFrom(request: Request): string | null {
