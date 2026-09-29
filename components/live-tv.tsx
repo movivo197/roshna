@@ -18,7 +18,11 @@ import {
   Smile,
   Heart,
   ShieldCheck,
-  Layers
+  Layers,
+  Sparkles,
+  Music2,
+  Search,
+  Server
 } from 'lucide-react';
 
 declare global {
@@ -30,158 +34,406 @@ declare global {
 export type TVChannel = {
   id: string;
   name: string;
-  category: 'sports' | 'movies' | 'docs' | 'news' | 'kids' | 'general';
+  category: 'satellite' | 'sports' | 'movies' | 'music' | 'docs' | 'news' | 'kids' | 'general';
   logo: string;
   badge: string;
   description: string;
   streamUrl: string;
+  backupUrls?: string[];
   epgCurrent: string;
   epgNext: string;
 };
 
 const TV_CHANNELS: TVChannel[] = [
+  // ─── ماهواره‌ای و پرطرفدار فارسی (SATELLITE & PERSIAN FTA) ───
+  {
+    id: 'persiana_cinema',
+    name: 'پرشیانا سینما (Persiana Cinema)',
+    category: 'satellite',
+    logo: '🎬',
+    badge: 'FHD',
+    description: 'برترین فیلم‌های سینمایی روز جهان و هالیوود با دوبله و زیرنویس اختصاصی',
+    streamUrl: 'https://cinehls.persiana.live/hls/stream.m3u8',
+    backupUrls: ['https://gcinemahls.wns.live/hls/stream.m3u8'],
+    epgCurrent: 'فیلم سینمایی برتر جهان',
+    epgNext: 'شاهکارهای سینمای اکشن و درام',
+  },
+  {
+    id: 'rjtv',
+    name: 'رادیو جوان (Radio Javan TV)',
+    category: 'music',
+    logo: '🎧',
+    badge: '1080p',
+    description: 'پخش ۲۴ ساعته برترین موزیک‌ویدیوها، مصاحبه‌ها، کنسرت‌ها و برنامه‌های اختصاصی',
+    streamUrl: 'https://rjtvhls.wns.live/hls/stream.m3u8',
+    backupUrls: ['https://musichls.persiana.live/hls/stream.m3u8', 'https://hls.avang.live/hls/stream.m3u8'],
+    epgCurrent: 'موزیک‌ویدیوهای روز و برترین ریمیکس‌ها',
+    epgNext: 'برنامه اختصاصی گرند استودیو RJ',
+  },
+  {
+    id: 'avaseries',
+    name: 'آوا سریال (AVA Series HD)',
+    category: 'movies',
+    logo: '📺',
+    badge: 'HD',
+    description: 'پخش محبوب‌ترین سریال‌های داستانی، خانوادگی، درام و ترکی با دوبله پارسی',
+    streamUrl: 'https://avaserieshls.wns.live/hls/stream.m3u8',
+    backupUrls: ['https://onehls.persiana.live/hls/stream.m3u8'],
+    epgCurrent: 'سریال درام و پرمخاطب',
+    epgNext: 'قسمت جدید سریال محبوب خانوادگی',
+  },
+  {
+    id: 'avafamily',
+    name: 'آوا فمیلی (AVA Family)',
+    category: 'satellite',
+    logo: '🍿',
+    badge: 'HD',
+    description: 'سرگرمی‌های شاد خانوادگی، فیلم، انیمیشن و شوهای تلویزیونی',
+    streamUrl: 'https://familyhls.avatv.live/hls/stream.m3u8',
+    backupUrls: ['https://familyhls.persiana.live/hls/stream.m3u8'],
+    epgCurrent: 'برنامه شاد و سرگرمی خانوادگی',
+    epgNext: 'فیلم سینمایی عصرگاهی',
+  },
+  {
+    id: 'fx1',
+    name: 'اف‌ایکس ۱ (FX 1 HD)',
+    category: 'movies',
+    logo: '⚡',
+    badge: 'HD',
+    description: 'سینمای هیجان‌انگیز، فیلم‌های علمی‌تخیلی، اکشن و ماجراجویی بدون سانسور',
+    streamUrl: 'https://fxtvhls.wns.live/hls/stream.m3u8',
+    backupUrls: ['https://slonehls.wns.live/hls/stream.m3u8'],
+    epgCurrent: 'فیلم هیجان‌انگیز و اکشن هالیوودی',
+    epgNext: 'سینمایی معمایی و تخیلی',
+  },
+  {
+    id: 'persiana_iranian',
+    name: 'پرشیانا ایرانی (Persiana Iranian)',
+    category: 'movies',
+    logo: '🇮🇷',
+    badge: 'HD',
+    description: 'پخش برترین فیلم‌های سینمای ایران، آثار ماندگار و سریال‌های محبوب ایرانی',
+    streamUrl: 'https://irhls.persiana.live/hls/stream.m3u8',
+    backupUrls: ['https://metafilmhls.wns.live/hls/stream.m3u8'],
+    epgCurrent: 'فیلم سینمایی برگزیده ایرانی',
+    epgNext: 'نوستالژی‌های سینمای ایران',
+  },
+  {
+    id: 'persiana_comedy',
+    name: 'پرشیانا کمدی (Persiana Comedy)',
+    category: 'satellite',
+    logo: '😂',
+    badge: 'HD',
+    description: 'خنده‌دارترین فیلم‌های کمدی جهان، شوها و برنامه‌های طنز ۲۴ ساعته',
+    streamUrl: 'https://comedyhls.persiana.live/hls/stream.m3u8',
+    backupUrls: ['https://cafefhls.wns.live/hls/stream.m3u8'],
+    epgCurrent: 'فیلم کمدی و طنز خانوادگی',
+    epgNext: 'استندآپ کمدی و شوهای خنده',
+  },
+  {
+    id: 'persiana_series',
+    name: 'پرشیانا سریز (Persiana Series)',
+    category: 'movies',
+    logo: '🎞️',
+    badge: 'HD',
+    description: 'پخش مداوم بهترین سریال‌های هالیوود و جهان با زیرنویس و دوبله',
+    streamUrl: 'https://onehls.persiana.live/hls/stream.m3u8',
+    backupUrls: ['https://sltwohls.wns.live/hls/stream.m3u8'],
+    epgCurrent: 'پخش سریال پرمخاطب جهانی',
+    epgNext: 'پشت صحنه و نقد سریال',
+  },
+  {
+    id: 'persiana_music',
+    name: 'پرشیانا موزیک (4Music / Persiana Music)',
+    category: 'music',
+    logo: '🎵',
+    badge: 'HD',
+    description: 'برترین موسیقی‌های پاپ، هیپ‌هاپ، راک، نوستالژی و ریمیکس‌های شاد',
+    streamUrl: 'https://musichls.persiana.live/hls/stream.m3u8',
+    backupUrls: ['https://raphls.persiana.live/hls/stream.m3u8'],
+    epgCurrent: 'تاپ موزیک و تازه‌های ترانه',
+    epgNext: 'پلی‌لیست پرانرژی روزانه',
+  },
+  {
+    id: 'avang',
+    name: 'آوانگ تی‌وی (Avang TV HD)',
+    category: 'music',
+    logo: '🎸',
+    badge: '1080p',
+    description: 'موزیک ویدیوهای کمپانی آوانگ و هنرمندان نام‌آشنای موسیقی پاپ',
+    streamUrl: 'https://hls.avang.live/hls/stream.m3u8',
+    backupUrls: ['https://rjtvhls.wns.live/hls/stream.m3u8'],
+    epgCurrent: 'موزیک ویدیوهای اختصاصی آوانگ',
+    epgNext: 'کنسرت‌های خاطره‌انگیز',
+  },
+  {
+    id: 'persiana_docs',
+    name: 'پرشیانا مستند و علم (Persiana Science & Docs)',
+    category: 'docs',
+    logo: '🌌',
+    badge: 'HD',
+    description: 'مستندهای شگفت‌انگیز کهکشان، اقیانوس‌ها، فناوری و حیات وحش با دوبله فارسی',
+    streamUrl: 'https://scihls.persiana.live/hls/stream.m3u8',
+    backupUrls: ['https://ptravelhls.persiana.live/hls/stream.m3u8'],
+    epgCurrent: 'مستند شگفتی‌های کیهان و علم',
+    epgNext: 'کاوش در اعماق طبیعت و حیات وحش',
+  },
+  {
+    id: 'persiana_travel',
+    name: 'پرشیانا گردشگری و سفر (Persiana Travel)',
+    category: 'docs',
+    logo: '✈️',
+    badge: 'HD',
+    description: 'زیباترین مقاصد گردشگری جهان، فرهنگ‌ها، جاذبه‌ها و ماجراجویی‌های دیدنی',
+    streamUrl: 'https://ptravelhls.persiana.live/hls/stream.m3u8',
+    backupUrls: ['https://scihls.persiana.live/hls/stream.m3u8'],
+    epgCurrent: 'سفر به زیباترین شهرهای دنیا',
+    epgNext: 'مستند جاذبه‌های توریستی و فرهنگ ملل',
+  },
+  {
+    id: 'persiana_fight',
+    name: 'پرشیانا مبارزه و ورزش (Persiana Fight)',
+    category: 'sports',
+    logo: '🥊',
+    badge: 'HD',
+    description: 'پوشش مسابقات UFC، بوکس، کشتی‌کج، موی‌تای و مبارزات رزمی معتبر دنیا',
+    streamUrl: 'https://fighthls.persiana.live/hls/stream.m3u8',
+    backupUrls: ['https://rbmn-live.akamaized.net/hls/live/590964/BoRB-AT/master.m3u8'],
+    epgCurrent: 'مسابقات قهرمانی UFC و بوکس حرفه‌ای',
+    epgNext: 'بهترین ناک‌اوت‌های تاریخ ورزش رزمی',
+  },
+  {
+    id: 'persiana_korea',
+    name: 'پرشیانا کره (Persiana Korea)',
+    category: 'movies',
+    logo: '🌸',
+    badge: 'HD',
+    description: 'محبوب‌ترین کی‌دراماها (K-Drama)، فیلم‌های کره‌ای و برنامه‌های K-Pop',
+    streamUrl: 'https://korhls.persiana.live/hls/stream.m3u8',
+    backupUrls: ['https://onehls.persiana.live/hls/stream.m3u8'],
+    epgCurrent: 'سریال پرطرفدار کره‌ای با زیرنویس',
+    epgNext: 'برنامه ویژه موسیقی و درام آسیایی',
+  },
+  {
+    id: 'persiana_nostalgia',
+    name: 'پرشیانا خاطره‌ها (Persiana Nostalgia)',
+    category: 'satellite',
+    logo: '📻',
+    badge: 'HD',
+    description: 'ترانه‌ها، شوها، فیلم‌ها و سریال‌های خاطره‌انگیز دهه‌های گذشته',
+    streamUrl: 'https://noshls.persiana.live/hls/stream.m3u8',
+    backupUrls: ['https://clshls.wns.live/hls/stream.m3u8'],
+    epgCurrent: 'ترانه‌ها و برنامه‌های قدیمی و خاطره‌انگیز',
+    epgNext: 'سینمای کلاسیک طلایی',
+  },
+  {
+    id: 'grand_cinema',
+    name: 'گرند سینما (Grand Cinema HD)',
+    category: 'movies',
+    logo: '🎥',
+    badge: 'HD',
+    description: 'پخش فیلم‌های تحسین‌شده جشنواره‌ها، آثار بلاک‌باستر و سینمای جهان',
+    streamUrl: 'https://gcinemahls.wns.live/hls/stream.m3u8',
+    backupUrls: ['https://cinehls.persiana.live/hls/stream.m3u8'],
+    epgCurrent: 'فیلم سینمایی برتر هالیوود',
+    epgNext: 'آثار برگزیده اسکار و کن',
+  },
+  {
+    id: 'four_u_tv',
+    name: 'فور یو تی‌وی (4U TV HD)',
+    category: 'satellite',
+    logo: '🌟',
+    badge: 'HD',
+    description: 'سرگرمی، موسیقی، فیلم‌های سینمایی و برنامه‌های متنوع تلویزیونی',
+    streamUrl: 'https://hls.4utv.live/hls/stream.m3u8',
+    backupUrls: ['https://familyhls.avatv.live/hls/stream.m3u8'],
+    epgCurrent: 'برنامه شاد و مسابقه تلویزیونی',
+    epgNext: 'موزیک و شوهای روز',
+  },
+  {
+    id: 'toonix_kids',
+    name: 'تونیکس کارتون (Toonix Kids)',
+    category: 'kids',
+    logo: '🦄',
+    badge: 'HD',
+    description: 'پخش کارتون‌ها، انیمیشن‌های دوبله فارسی، ماجراجویی و برنامه‌های شاد کودکان',
+    streamUrl: 'https://toonixhls.wns.live/hls/stream.m3u8',
+    backupUrls: ['https://junhls.persiana.live/hls/stream.m3u8'],
+    epgCurrent: 'انیمیشن شاد و ماجراجویانه با دوبله',
+    epgNext: 'کارتون‌های جذاب ویژه خردسالان و کودکان',
+  },
+  {
+    id: 'persiana_junior',
+    name: 'پرشیانا جونیور (Persiana Junior)',
+    category: 'kids',
+    logo: '🎈',
+    badge: 'HD',
+    description: 'دنیای سرشار از رنگ، کارتون‌های آموزنده و قصه‌های کودکانه',
+    streamUrl: 'https://junhls.persiana.live/hls/stream.m3u8',
+    backupUrls: ['https://toonixhls.wns.live/hls/stream.m3u8'],
+    epgCurrent: 'انیمیشن‌های آموزنده و شاد',
+    epgNext: 'برنامه کودک و آموزش مهارت‌ها',
+  },
+  {
+    id: 'iran_intl',
+    name: 'ایران اینترنشنال (Iran International)',
+    category: 'news',
+    logo: '🌐',
+    badge: '1080p',
+    description: 'پوشش زنده ۲۴ ساعته اخبار، گزارش‌های ویژه، تحلیل‌های اقتصادی و بین‌المللی',
+    streamUrl: 'https://hlspackager.akamaized.net/live/DB/IRAN_INTERNATIONAL/HLS/IRAN_INTERNATIONAL.m3u8',
+    backupUrls: ['https://tv-trtworld.medya.trt.com.tr/master.m3u8'],
+    epgCurrent: 'بولتن زنده خبری و پوشش رویدادها',
+    epgNext: 'برنامه تحلیلی و اتاق خبر',
+  },
+  {
+    id: 'redbull_tv',
+    name: 'ردبول تی‌وی (Red Bull TV HD)',
+    category: 'sports',
+    logo: '🏄‍♂️',
+    badge: '1080p',
+    description: 'ورزش‌های اکستریم، اسنوبورد، ردبول فرمول یک، آفرود و هیجان فوق‌العاده',
+    streamUrl: 'https://rbmn-live.akamaized.net/hls/live/590964/BoRB-AT/master.m3u8',
+    backupUrls: ['https://fighthls.persiana.live/hls/stream.m3u8'],
+    epgCurrent: 'مسابقات ردبول آکروباتیک و موتورسواری',
+    epgNext: 'ماجراجویی در صخره‌ها و موج‌سواری',
+  },
+  {
+    id: 'nasa_tv',
+    name: 'ناسا تی‌وی (NASA TV Live HD)',
+    category: 'docs',
+    logo: '🚀',
+    badge: '1080p',
+    description: 'پخش زنده ۲۴ ساعته از ایستگاه فضایی بین‌المللی، پرتاب موشک‌ها و اسرار کیهان',
+    streamUrl: 'https://ntv1.akamaized.net/hls/live/2014075/NASA-NTV1-HLS/master.m3u8',
+    backupUrls: ['https://scihls.persiana.live/hls/stream.m3u8'],
+    epgCurrent: 'پخش زنده ایستگاه فضایی بین‌المللی ISS',
+    epgNext: 'مستند کاوش‌های مریخ و تلسکوپ جیمز وب',
+  },
+  {
+    id: 'trt_world',
+    name: 'تی‌آرتی ورد (TRT World News HD)',
+    category: 'news',
+    logo: '🌍',
+    badge: '1080p',
+    description: 'شبکه بین‌المللی اخبار جهان، تحلیل رویدادهای منطقه‌ای و مستندهای جهانی',
+    streamUrl: 'https://tv-trtworld.medya.trt.com.tr/master.m3u8',
+    backupUrls: ['https://hlspackager.akamaized.net/live/DB/IRAN_INTERNATIONAL/HLS/IRAN_INTERNATIONAL.m3u8'],
+    epgCurrent: 'World News Bulletin Live',
+    epgNext: 'Insight Documentary & Global Analysis',
+  },
+
+  // ─── شبکه‌های ملی و صدا و سیما (IRIB CHANNELS) ───
   {
     id: 'tv3',
-    name: 'شبکه سه سیما',
+    name: 'شبکه سه سیما (TV 3)',
     category: 'sports',
     logo: '⚽',
     badge: 'HD',
     description: 'ورزش، فوتبال زنده لیگ برتر و اروپا، مسابقات و سریال‌های پرطرفدار',
-    streamUrl: 'https://cdn1.telewebion.com/live/tv3/playlist.m3u8',
+    streamUrl: 'https://ncdn.telewebion.ir/tv3/live/playlist.m3u8',
+    backupUrls: ['https://fighthls.persiana.live/hls/stream.m3u8'],
     epgCurrent: 'پخش زنده مسابقات ورزشی و فوتبال',
     epgNext: 'گزارش ورزشی و تحلیل لیگ',
   },
   {
     id: 'varzesh',
-    name: 'شبکه ورزش',
+    name: 'شبکه ورزش (Varzesh TV)',
     category: 'sports',
     logo: '🏆',
     badge: 'HD',
     description: 'پخش زنده تخصصی رویدادهای ورزشی ایران و جهان، کشتی و والیبال',
-    streamUrl: 'https://cdn1.telewebion.com/live/varzesh/playlist.m3u8',
+    streamUrl: 'https://ncdn.telewebion.ir/varzesh/live/playlist.m3u8',
+    backupUrls: ['https://rbmn-live.akamaized.net/hls/live/590964/BoRB-AT/master.m3u8'],
     epgCurrent: 'رویدادهای زنده ورزشی جهان',
     epgNext: 'شب‌های فوتبالی و دنیای ورزش',
   },
   {
     id: 'nasim',
-    name: 'شبکه نسیم',
-    category: 'movies',
+    name: 'شبکه نسیم (Nasim TV)',
+    category: 'general',
     logo: '🎭',
     badge: 'HD',
     description: 'نشاط و سرگرمی خانوادگی، برنامه‌های کمدی و مسابقات طنز',
-    streamUrl: 'https://cdn1.telewebion.com/live/nasim/playlist.m3u8',
+    streamUrl: 'https://ncdn.telewebion.ir/nasim/live/playlist.m3u8',
+    backupUrls: ['https://comedyhls.persiana.live/hls/stream.m3u8'],
     epgCurrent: 'مسابقه و سرگرمی خانوادگی',
     epgNext: 'برنامه طنز و موسیقی شبانه',
   },
   {
     id: 'mostanad',
-    name: 'شبکه مستند',
+    name: 'شبکه مستند (Mostanad TV)',
     category: 'docs',
     logo: '🌿',
     badge: 'HD',
-    description: 'مستندهای شگفت‌انگیز حیات وحش، تاریخ، کهکشان و فناوری با کیفیت بالا',
-    streamUrl: 'https://cdn1.telewebion.com/live/mostanad/playlist.m3u8',
+    description: 'مستندهای حیات وحش، تاریخ، کهکشان و فناوری با کیفیت بالا',
+    streamUrl: 'https://ncdn.telewebion.ir/mostanad/live/playlist.m3u8',
+    backupUrls: ['https://scihls.persiana.live/hls/stream.m3u8'],
     epgCurrent: 'مستند شگفتی‌های خلقت و طبیعت',
     epgNext: 'مستند کاوشگران فضا و فناوری',
   },
   {
-    id: 'ifilm',
-    name: 'شبکه آی‌فیلم',
-    category: 'movies',
-    logo: '🎬',
-    badge: 'HD',
-    description: 'سریال‌ها و فیلم‌های ماندگار سینمای ایران و خاطره‌انگیزترین آثار تلویزیونی',
-    streamUrl: 'https://cdn1.telewebion.com/live/ifilm/playlist.m3u8',
-    epgCurrent: 'سریال داستانی و اجتماعی',
-    epgNext: 'فیلم سینمایی برگزیده',
-  },
-  {
-    id: 'namayesh',
-    name: 'شبکه نمایش',
-    category: 'movies',
-    logo: '🍿',
-    badge: 'HD',
-    description: 'فیلم‌های سینمایی برتر جهان، هالیوود و سینمای کلاسیک',
-    streamUrl: 'https://cdn1.telewebion.com/live/namayesh/playlist.m3u8',
-    epgCurrent: 'فیلم سینمایی منتخب جهان',
-    epgNext: 'سینمای کلاسیک و شاهکارهای برتر',
-  },
-  {
-    id: 'irinn',
-    name: 'شبکه خبر',
-    category: 'news',
-    logo: '📰',
-    badge: 'HD',
-    description: 'پوشش زنده و ۲۴ ساعته رویدادها و اخبار سیاسی، اقتصادی و بین‌المللی',
-    streamUrl: 'https://cdn1.telewebion.com/live/irinn/playlist.m3u8',
-    epgCurrent: 'بخش خبری و گزارش تحلیلی',
-    epgNext: 'گفتگوی ویژه خبری و اقتصاد',
-  },
-  {
-    id: 'tv1',
-    name: 'شبکه یک سیما',
-    category: 'general',
-    logo: '🇮🇷',
-    badge: 'HD',
-    description: 'شبکه ملی؛ اخبار، برنامه‌های گفتگومحور، مستند و سریال‌های فاخر',
-    streamUrl: 'https://cdn1.telewebion.com/live/tv1/playlist.m3u8',
-    epgCurrent: 'برنامه فرهنگی و اجتماعی صبحگاهی',
-    epgNext: 'اخبار سراسری ساعت ۱۴',
-  },
-  {
     id: 'pooya',
-    name: 'شبکه پویا و نهال',
+    name: 'شبکه پویا و نهال (Pooya TV)',
     category: 'kids',
     logo: '🎈',
     badge: 'HD',
     description: 'کارتون‌ها، انیمیشن‌های آموزنده و برنامه‌های شاد ویژه کودک و نوجوان',
-    streamUrl: 'https://cdn1.telewebion.com/live/pooya/playlist.m3u8',
+    streamUrl: 'https://ncdn.telewebion.ir/pooya/live/playlist.m3u8',
+    backupUrls: ['https://toonixhls.wns.live/hls/stream.m3u8'],
     epgCurrent: 'انیمیشن‌های جذاب و سرگرم‌کننده',
     epgNext: 'برنامه شاد کودکانه و قصه',
   },
   {
-    id: 'amoozesh',
-    name: 'شبکه آموزش',
-    category: 'docs',
-    logo: '📚',
+    id: 'tv1',
+    name: 'شبکه یک سیما (TV 1)',
+    category: 'general',
+    logo: '🇮🇷',
     badge: 'HD',
-    description: 'آموزش مهارت‌های زندگی، دروس دانشگاهی، کنکور و رشد شخصی',
-    streamUrl: 'https://cdn1.telewebion.com/live/amoozesh/playlist.m3u8',
-    epgCurrent: 'آموزش مهارت و توسعه فردی',
-    epgNext: 'کلاس‌های درس و مباحث علمی',
+    description: 'شبکه ملی؛ اخبار، برنامه‌های گفتگومحور، مستند و سریال‌های فاخر',
+    streamUrl: 'https://ncdn.telewebion.ir/tv1/live/playlist.m3u8',
+    backupUrls: ['https://irhls.persiana.live/hls/stream.m3u8'],
+    epgCurrent: 'برنامه فرهنگی و اجتماعی',
+    epgNext: 'اخبار سراسری ساعت ۲۱',
   },
   {
-    id: 'tv4',
-    name: 'شبکه چهار (فرهیختگان)',
-    category: 'docs',
-    logo: '🔬',
+    id: 'namayesh',
+    name: 'شبکه نمایش (Namayesh TV)',
+    category: 'movies',
+    logo: '🍿',
     badge: 'HD',
-    description: 'علم، فلسفه، اندیشه، ادبیات و برنامه‌های تخصصی دانشگاهی',
-    streamUrl: 'https://cdn1.telewebion.com/live/tv4/playlist.m3u8',
-    epgCurrent: 'برنامه علمی و معرفتی تخصصی',
-    epgNext: 'سینما چهار و تحلیل فلسفی',
+    description: 'فیلم‌های سینمایی برتر جهان، هالیوود و سینمای کلاسیک',
+    streamUrl: 'https://ncdn.telewebion.ir/namayesh/live/playlist.m3u8',
+    backupUrls: ['https://cinehls.persiana.live/hls/stream.m3u8'],
+    epgCurrent: 'فیلم سینمایی منتخب جهان',
+    epgNext: 'سینمای کلاسیک و شاهکارهای برتر',
   },
 ];
 
 const CATEGORIES = [
   { id: 'all', label: 'همه شبکه‌ها', icon: Layers },
+  { id: 'satellite', label: 'ماهواره‌ای و فارسی', icon: Sparkles },
+  { id: 'movies', label: 'فیلم و سریال', icon: Film },
+  { id: 'music', label: 'موزیک و شو', icon: Music2 },
   { id: 'sports', label: 'ورزش و فوتبال', icon: Dumbbell },
-  { id: 'movies', label: 'فیلم و سرگرمی', icon: Film },
-  { id: 'docs', label: 'مستند و دانش', icon: Compass },
-  { id: 'news', label: 'اخبار و رویدادها', icon: Newspaper },
-  { id: 'kids', label: 'کودک و نوجوان', icon: Smile },
+  { id: 'docs', label: 'مستند و فضا', icon: Compass },
+  { id: 'kids', label: 'کارتون و کودک', icon: Smile },
+  { id: 'news', label: 'اخبار و رویداد', icon: Newspaper },
+  { id: 'general', label: 'شبکه‌های سراسری', icon: Tv },
 ];
 
 export default function LiveTV() {
   const [selectedChannel, setSelectedChannel] = useState<TVChannel>(TV_CHANNELS[0]);
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [currentServerIndex, setCurrentServerIndex] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
-  const [favorites, setFavorites] = useState<string[]>(['tv3', 'varzesh', 'mostanad']);
+  const [favorites, setFavorites] = useState<string[]>(['persiana_cinema', 'rjtv', 'avaseries', 'persiana_fight']);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const playerContainerRef = useRef<HTMLDivElement>(null);
@@ -191,22 +443,34 @@ export default function LiveTV() {
     try {
       const saved = JSON.parse(localStorage.getItem('roshna-tv-favorites') || '[]');
       if (Array.isArray(saved) && saved.length > 0) setFavorites(saved);
-    } catch {
-      /* ignore */
-    }
+    } catch {}
   }, []);
 
-  // Ensure HLS.js script is loaded
+  // Ensure HLS.js script is loaded with fallback CDN
   useEffect(() => {
-    if (typeof window !== 'undefined' && !window.Hls) {
-      const script = document.createElement('script');
-      script.src = 'https://cdn.jsdelivr.net/npm/hls.js@1.5.8/dist/hls.min.js';
-      script.async = true;
-      script.onload = () => {
-        loadChannel(selectedChannel);
-      };
-      document.head.appendChild(script);
+    if (typeof window === 'undefined') return;
+    if (window.Hls) {
+      loadChannel(selectedChannel, 0);
+      return;
     }
+
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.5.8/hls.min.js';
+    script.async = true;
+    script.onload = () => {
+      loadChannel(selectedChannel, 0);
+    };
+    script.onerror = () => {
+      // Fallback CDN
+      const fallback = document.createElement('script');
+      fallback.src = 'https://cdn.jsdelivr.net/npm/hls.js@1.5.8/dist/hls.min.js';
+      fallback.async = true;
+      fallback.onload = () => {
+        loadChannel(selectedChannel, 0);
+      };
+      document.head.appendChild(fallback);
+    };
+    document.head.appendChild(script);
   }, []);
 
   const toggleFavorite = (channelId: string) => {
@@ -216,18 +480,25 @@ export default function LiveTV() {
     setFavorites(next);
     try {
       localStorage.setItem('roshna-tv-favorites', JSON.stringify(next));
-    } catch {
-      /* ignore */
-    }
+    } catch {}
   };
 
+  // Get stream URL by server index
+  const getStreamUrl = useCallback((channel: TVChannel, serverIdx: number) => {
+    const allUrls = [channel.streamUrl, ...(channel.backupUrls || [])];
+    return allUrls[serverIdx % allUrls.length] || channel.streamUrl;
+  }, []);
+
   // Setup HLS Player
-  const loadChannel = useCallback((channel: TVChannel) => {
+  const loadChannel = useCallback((channel: TVChannel, serverIdx = 0) => {
     const video = videoRef.current;
     if (!video) return;
 
     setIsLoading(true);
     setHasError(false);
+    setCurrentServerIndex(serverIdx);
+
+    const streamToLoad = getStreamUrl(channel, serverIdx);
 
     if (hlsInstanceRef.current) {
       hlsInstanceRef.current.destroy();
@@ -243,13 +514,17 @@ export default function LiveTV() {
         backBufferLength: 30,
         maxBufferLength: 30,
         maxMaxBufferLength: 60,
+        manifestLoadingTimeOut: 8000,
+        levelLoadingTimeOut: 8000,
+        fragLoadingTimeOut: 12000,
       });
 
-      hls.loadSource(channel.streamUrl);
+      hls.loadSource(streamToLoad);
       hls.attachMedia(video);
 
       hls.on(HlsLib.Events.MANIFEST_PARSED, () => {
         setIsLoading(false);
+        setHasError(false);
         video.play().then(() => setIsPlaying(true)).catch(() => {
           setIsPlaying(false);
         });
@@ -259,7 +534,14 @@ export default function LiveTV() {
         if (data.fatal) {
           switch (data.type) {
             case HlsLib.ErrorTypes.NETWORK_ERROR:
-              hls.startLoad();
+              const totalServers = 1 + (channel.backupUrls?.length || 0);
+              if (serverIdx + 1 < totalServers) {
+                // Auto try next backup server
+                hls.destroy();
+                loadChannel(channel, serverIdx + 1);
+              } else {
+                hls.startLoad();
+              }
               break;
             case HlsLib.ErrorTypes.MEDIA_ERROR:
               hls.recoverMediaError();
@@ -276,30 +558,35 @@ export default function LiveTV() {
       hlsInstanceRef.current = hls;
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
       // Native HLS for Safari / iOS
-      video.src = channel.streamUrl;
+      video.src = streamToLoad;
       video.onloadedmetadata = () => {
         setIsLoading(false);
+        setHasError(false);
         video.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
       };
       video.onerror = () => {
-        setHasError(true);
-        setIsLoading(false);
-      };
-    } else {
-      // If HlsLib is not yet loaded, wait 500ms and retry
-      setTimeout(() => {
-        if (window.Hls) {
-          loadChannel(channel);
+        const totalServers = 1 + (channel.backupUrls?.length || 0);
+        if (serverIdx + 1 < totalServers) {
+          loadChannel(channel, serverIdx + 1);
         } else {
           setHasError(true);
           setIsLoading(false);
         }
-      }, 600);
+      };
+    } else {
+      setTimeout(() => {
+        if (window.Hls) {
+          loadChannel(channel, serverIdx);
+        } else {
+          setHasError(true);
+          setIsLoading(false);
+        }
+      }, 700);
     }
-  }, []);
+  }, [getStreamUrl]);
 
   useEffect(() => {
-    loadChannel(selectedChannel);
+    loadChannel(selectedChannel, 0);
     return () => {
       if (hlsInstanceRef.current) {
         hlsInstanceRef.current.destroy();
@@ -307,6 +594,12 @@ export default function LiveTV() {
       }
     };
   }, [selectedChannel, loadChannel]);
+
+  const switchServer = () => {
+    const totalServers = 1 + (selectedChannel.backupUrls?.length || 0);
+    const nextIdx = (currentServerIndex + 1) % totalServers;
+    loadChannel(selectedChannel, nextIdx);
+  };
 
   const togglePlay = () => {
     const video = videoRef.current;
@@ -346,9 +639,17 @@ export default function LiveTV() {
     }
   };
 
-  const filteredChannels = TV_CHANNELS.filter(
-    (ch) => categoryFilter === 'all' || ch.category === categoryFilter
-  );
+  const filteredChannels = TV_CHANNELS.filter((ch) => {
+    const matchCat = categoryFilter === 'all' || ch.category === categoryFilter;
+    const matchSearch =
+      !searchQuery.trim() ||
+      ch.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      ch.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      ch.epgCurrent.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchCat && matchSearch;
+  });
+
+  const availableServersCount = 1 + (selectedChannel.backupUrls?.length || 0);
 
   return (
     <div className="tv-hub-container" dir="rtl">
@@ -358,17 +659,17 @@ export default function LiveTV() {
           <span className="tv-eyebrow">
             <Radio size={16} /> تلویزیون اینترنتی زنده روشنا
           </span>
-          <h1>پخش زنده شبکه‌های سراسری</h1>
+          <h1>پخش زنده شبکه‌های ماهواره‌ای و سراسری</h1>
           <p>
-            تماشای بدون وقفه و با کیفیت بالای شبکه‌های ملی، ورزشی، فیلم و مستند بدون نیاز به فیلترشکن.
+            تماشای زنده و رایگان بیش از ۲۵ شبکه پرطرفدار سینمایی، موسیقی، ورزشی، مستند و کودک با سرورهای پرسرعت CDN بدون قطعی.
           </p>
         </div>
         <div className="tv-hero-badge">
           <div className="tv-live-pill">
             <span className="tv-pulse-dot" />
-            <strong>پخش زنده HLS</strong>
+            <strong>پخش زنده Full HD</strong>
           </div>
-          <small>ترافیک نیم‌بهاء داخلی</small>
+          <small>{TV_CHANNELS.length} شبکه اختصاصی فعال</small>
         </div>
       </header>
 
@@ -390,18 +691,25 @@ export default function LiveTV() {
             {isLoading && (
               <div className="tv-player-overlay">
                 <RefreshCw size={36} className="tv-spin" />
-                <span>در حال دریافت سیگنال پخش زنده...</span>
+                <span>در حال اتصال به سرور سیگنال {selectedChannel.name}...</span>
               </div>
             )}
 
             {hasError && (
               <div className="tv-player-overlay error">
                 <Tv size={42} />
-                <strong>سیگنال موقتاً قطع است</strong>
-                <p>کانال دیگری را انتخاب کنید یا دوباره تلاش فرمایید.</p>
-                <button type="button" className="g-btn primary" onClick={() => loadChannel(selectedChannel)}>
-                  <RefreshCw size={15} /> تلاش مجدد
-                </button>
+                <strong>سیگنال این سرور در دسترس نیست</strong>
+                <p>می‌توانید سرور کمکی را تغییر دهید یا شبکه دیگری را انتخاب کنید.</p>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  {availableServersCount > 1 && (
+                    <button type="button" className="g-btn primary" onClick={switchServer}>
+                      <Server size={15} /> تعویض سرور پخش (سرور {currentServerIndex + 1} از {availableServersCount})
+                    </button>
+                  )}
+                  <button type="button" className="g-btn" onClick={() => loadChannel(selectedChannel, 0)}>
+                    <RefreshCw size={15} /> تلاش مجدد
+                  </button>
+                </div>
               </div>
             )}
 
@@ -433,6 +741,18 @@ export default function LiveTV() {
               </div>
 
               <div className="tv-controls-right">
+                {availableServersCount > 1 && (
+                  <button
+                    type="button"
+                    className="tv-ctrl-btn"
+                    onClick={switchServer}
+                    title={`تعویض سرور (سرور ${currentServerIndex + 1} از ${availableServersCount})`}
+                    style={{ fontSize: '11px', display: 'flex', gap: '4px', padding: '0 8px' }}
+                  >
+                    <Server size={15} />
+                    <span>سرور {currentServerIndex + 1}</span>
+                  </button>
+                )}
                 <button
                   type="button"
                   className={`tv-ctrl-btn ${favorites.includes(selectedChannel.id) ? 'fav-active' : ''}`}
@@ -482,6 +802,27 @@ export default function LiveTV() {
 
         {/* Right Column: Channels Selector Sidebar */}
         <div className="tv-channels-sidebar">
+          {/* Search Box */}
+          <div style={{ position: 'relative', width: '100%' }}>
+            <Search size={16} style={{ position: 'absolute', right: '12px', top: '12px', color: 'var(--muted)' }} />
+            <input
+              type="text"
+              placeholder="جستجوی نام یا ژانر شبکه..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '9px 36px 9px 12px',
+                borderRadius: '12px',
+                border: '1px solid var(--line)',
+                background: 'var(--bg)',
+                fontSize: '12.5px',
+                color: 'var(--text)',
+                outline: 'none',
+              }}
+            />
+          </div>
+
           {/* Categories Selector */}
           <div className="tv-cats-pills">
             {CATEGORIES.map((cat) => {
@@ -502,33 +843,41 @@ export default function LiveTV() {
 
           {/* Channels Grid List */}
           <div className="tv-channels-list">
-            {filteredChannels.map((ch) => {
-              const isSelected = selectedChannel.id === ch.id;
-              const isFav = favorites.includes(ch.id);
-              return (
-                <button
-                  key={ch.id}
-                  type="button"
-                  className={`tv-ch-card ${isSelected ? 'selected' : ''}`}
-                  onClick={() => setSelectedChannel(ch)}
-                >
-                  <div className="tv-ch-icon">{ch.logo}</div>
-                  <div className="tv-ch-info">
-                    <div className="tv-ch-name-row">
-                      <strong>{ch.name}</strong>
-                      {isFav && <span className="tv-fav-star">★</span>}
+            {filteredChannels.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '30px 10px', color: 'var(--muted)', fontSize: '12.5px' }}>
+                شبکه‌ای با این مشخصات یافت نشد.
+              </div>
+            ) : (
+              filteredChannels.map((ch) => {
+                const isSelected = selectedChannel.id === ch.id;
+                const isFav = favorites.includes(ch.id);
+                return (
+                  <button
+                    key={ch.id}
+                    type="button"
+                    className={`tv-ch-card ${isSelected ? 'selected' : ''}`}
+                    onClick={() => {
+                      setSelectedChannel(ch);
+                    }}
+                  >
+                    <div className="tv-ch-icon">{ch.logo}</div>
+                    <div className="tv-ch-info">
+                      <div className="tv-ch-name-row">
+                        <strong>{ch.name}</strong>
+                        {isFav && <span className="tv-fav-star">★</span>}
+                      </div>
+                      <small>{ch.epgCurrent}</small>
                     </div>
-                    <small>{ch.epgCurrent}</small>
-                  </div>
-                  <span className="tv-ch-hd">{ch.badge}</span>
-                </button>
-              );
-            })}
+                    <span className="tv-ch-hd">{ch.badge}</span>
+                  </button>
+                );
+              })
+            )}
           </div>
 
           <div className="tv-sidebar-foot">
             <ShieldCheck size={16} />
-            <small>پخش مستقیم از CDN بدون قطعی</small>
+            <small>پخش پرسرعت و پایدار CDN با قابلیت تعویض سرور</small>
           </div>
         </div>
       </div>
