@@ -22,6 +22,9 @@ export const destinations = [
   {id:'self-discovery',label:'خودشناسی و خداشناسی',group:'رشد و آرامش',description:'سفری از درون به معنا؛ تأمل روزانه، خودآگاهی و کشف ارتباط با خدا'},
   {id:'meditation',label:'مدیتیشن',group:'رشد و آرامش',description:'۱۵ دقیقه مدیتیشن روزانه، تکنیک‌ها و تنفس هدایت‌شده'},
   {id:'workout',label:'ورزش روزانه',group:'رشد و آرامش',description:'۱۵ دقیقه ورزش هوازی روزانه، روتین‌های چرخشی و مربی هوشمند'},
+  {id:'mentor',label:'مربی زندگی هوش مصنوعی',group:'زندگی من',description:'همراه و مربی هوشمند برای تحلیل عادات، ذهن‌آگاهی و حل دغدغه‌ها'},
+  {id:'challenges',label:'افتخارات و چالش‌ها',group:'روز من',description:'چالش‌های ۳۰ روزه، نشان‌های افتخار و سطح کاربری (XP)'},
+  {id:'radio',label:'رادیو آرامش',group:'کشف و ارتباط',description:'موسیقی‌های لوفای، امواج آلفا و میکسر اصوات طبیعت'},
   {id:'gadgets',label:'گجت',group:'رشد و آرامش',description:'مکث‌های کوتاه برای ذهن و بدن'},
   {id:'settings',label:'تنظیمات',group:'شخصی‌سازی',description:'رنگ، ظاهر، حریم خصوصی و پشتیبان'},
 ] as const;

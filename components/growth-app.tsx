@@ -2,7 +2,7 @@
 
 import {useCallback, useEffect, useRef, useState} from 'react';
 import dynamic from 'next/dynamic';
-import {Gamepad2, MessageCircle, Newspaper, Tv} from 'lucide-react';
+import {Gamepad2, MessageCircle, Newspaper, Tv, Bot, Radio, Trophy} from 'lucide-react';
 import {destinations,readPreferences,type Destination} from '@/lib/product';
 import {DiscoveryDeck,FavoritesRail,GlobalSearch,NotificationCenter,Personalization,Onboarding,UsageSignal,ModuleSkeleton,ModuleBoundary} from '@/components/super-shell';
 import {Activity, ArrowLeft, ArrowRight, BookOpen, CalendarDays, Check, ChevronLeft, ChevronRight, CircleHelp, Clock3, Download, Flame, Flower2, Focus, Heart, LayoutDashboard, Leaf, Menu, MoreHorizontal, Pencil, Plus, Search, Settings, ShieldCheck, Sparkles, Sprout, Target, Trash2, TrendingUp, Upload, WifiOff, X} from 'lucide-react';
@@ -30,8 +30,12 @@ const MeditationHub=dynamic(()=>import('@/components/meditation-hub'),{loading:M
 const WorkoutHub=dynamic(()=>import('@/components/workout-hub'),{loading:ModuleSkeleton});
 const SelfDiscoveryHub=dynamic(()=>import('@/components/self-discovery-hub'),{loading:ModuleSkeleton});
 const LiveTV=dynamic(()=>import('@/components/live-tv'),{loading:ModuleSkeleton});
+const RadioHub=dynamic(()=>import('@/components/radio-hub'),{loading:ModuleSkeleton});
+const AiMentor=dynamic(()=>import('@/components/ai-mentor'),{loading:ModuleSkeleton});
+const GamificationHub=dynamic(()=>import('@/components/gamification-hub'),{loading:ModuleSkeleton});
 type Edit = {type:'task';value:Task}|{type:'goal';value:Goal}|{type:'habit';value:Habit}|{type:'journal';value:JournalEntry}|{type:'resource';value:Resource}|null;
 const navigation: {id:Tab;label:string;icon:typeof Leaf}[] = [
+  {id:'mentor',label:'مربی زندگی AI',icon:Bot as any},{id:'challenges',label:'افتخارات و چالش‌ها',icon:Trophy as any},{id:'radio',label:'رادیو آرامش',icon:Radio as any},
   {id:'companion',label:'همراه',icon:Sparkles},{id:'journeys',label:'مسیرهای رشد',icon:Sprout},{id:'projects',label:'کارگاه پروژه',icon:Target},{id:'reflection',label:'آینه شخصی',icon:Heart},{id:'trust',label:'مرکز اعتماد',icon:ShieldCheck},{id:'overview',label:'نمای کلاسیک',icon:LayoutDashboard},
   {id:'home',label:'خانه',icon:LayoutDashboard},{id:'community',label:'گفتگو',icon:MessageCircle},{id:'markets',label:'اخبار و بازار',icon:Newspaper},{id:'tv',label:'تلویزیون زنده',icon:Tv as any},{id:'games',label:'بازی',icon:Gamepad2},{id:'planner',label:'برنامه‌ریزی',icon:CalendarDays},{id:'goals',label:'هدف‌های من',icon:Target},
   {id:'habits',label:'عادت‌های کوچک',icon:Flame},{id:'journal',label:'دفتر خودشناسی',icon:BookOpen},{id:'wheel',label:'چرخه زندگی',icon:Flower2},
@@ -102,6 +106,9 @@ export default function GrowthApp(){
    {tab==='workout'&&<ModuleBoundary key="workout"><WorkoutHub/></ModuleBoundary>}
    {tab==='self-discovery'&&<ModuleBoundary key="self-discovery"><SelfDiscoveryHub/></ModuleBoundary>}
    {tab==='games'&&<ModuleBoundary key="games"><GameCenter/></ModuleBoundary>}
+   {tab==='mentor'&&<ModuleBoundary key="mentor"><AiMentor data={data} go={go} notify={notify}/></ModuleBoundary>}
+   {tab==='radio'&&<ModuleBoundary key="radio"><RadioHub/></ModuleBoundary>}
+   {tab==='challenges'&&<ModuleBoundary key="challenges"><GamificationHub data={data} notify={notify}/></ModuleBoundary>}
    {tab==='gadgets'&&<Gadgets data={data} update={update} notify={notify}/>}
    {tab==='overview'&&<>
     <div className="g-greeting"><div><span className="g-eyebrow">یک روز تازه، یک فرصت تازه</span><h1>سلام{data.profile.name?` ${data.profile.name}`:''}، به خودت خوش اومدی <span className="g-wave">☀</span></h1><p>لازم نیست همه‌چیز را تغییر بدهی؛ امروز فقط یک قدم کوچک بردار.</p></div><button className="g-btn" onClick={()=>addTask(today)}><Plus size={17}/>برنامه جدید</button></div>
