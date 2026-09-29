@@ -45,6 +45,17 @@ export type TVChannel = {
 };
 
 const TV_CHANNELS: TVChannel[] = [
+  {
+    id: '_canary',
+    name: 'تست سیگنال کَناری (Canary Self-Test)',
+    category: 'general',
+    logo: '🛡️',
+    badge: 'CANARY',
+    description: 'استریم زنده آزمایشی داخلی جهت سنجش سلامت پلیر HLS و رمزگشای دستگاه شما بدون وابستگی به اینترنت خارجی',
+    streamUrl: '/api/media/hls/_canary',
+    epgCurrent: 'تست داخلی خط لوله HLS.js و صدا و تصویر',
+    epgNext: 'سنجش سلامت کلاینت',
+  },
   // ─── ماهواره‌ای و پرطرفدار فارسی (SATELLITE & PERSIAN FTA) ───
   {
     id: 'persiana_cinema',
@@ -483,10 +494,9 @@ export default function LiveTV() {
     } catch {}
   };
 
-  // Get stream URL by server index
-  const getStreamUrl = useCallback((channel: TVChannel, serverIdx: number) => {
-    const allUrls = [channel.streamUrl, ...(channel.backupUrls || [])];
-    return allUrls[serverIdx % allUrls.length] || channel.streamUrl;
+  // Get same-origin stream endpoint through Roshana Media Gateway
+  const getStreamUrl = useCallback((channel: TVChannel, _serverIdx: number) => {
+    return `/api/media/hls/${encodeURIComponent(channel.id)}`;
   }, []);
 
   // Setup HLS Player
@@ -514,9 +524,9 @@ export default function LiveTV() {
         backBufferLength: 30,
         maxBufferLength: 30,
         maxMaxBufferLength: 60,
-        manifestLoadingTimeOut: 8000,
-        levelLoadingTimeOut: 8000,
-        fragLoadingTimeOut: 12000,
+        manifestLoadingTimeOut: 12000,
+        levelLoadingTimeOut: 12000,
+        fragLoadingTimeOut: 18000,
       });
 
       hls.loadSource(streamToLoad);
@@ -534,14 +544,7 @@ export default function LiveTV() {
         if (data.fatal) {
           switch (data.type) {
             case HlsLib.ErrorTypes.NETWORK_ERROR:
-              const totalServers = 1 + (channel.backupUrls?.length || 0);
-              if (serverIdx + 1 < totalServers) {
-                // Auto try next backup server
-                hls.destroy();
-                loadChannel(channel, serverIdx + 1);
-              } else {
-                hls.startLoad();
-              }
+              hls.startLoad();
               break;
             case HlsLib.ErrorTypes.MEDIA_ERROR:
               hls.recoverMediaError();
@@ -565,13 +568,8 @@ export default function LiveTV() {
         video.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
       };
       video.onerror = () => {
-        const totalServers = 1 + (channel.backupUrls?.length || 0);
-        if (serverIdx + 1 < totalServers) {
-          loadChannel(channel, serverIdx + 1);
-        } else {
-          setHasError(true);
-          setIsLoading(false);
-        }
+        setHasError(true);
+        setIsLoading(false);
       };
     } else {
       setTimeout(() => {

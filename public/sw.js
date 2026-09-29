@@ -83,6 +83,10 @@ self.addEventListener("fetch", (event) => {
   const request = event.request;
   const url = new URL(request.url);
   if (request.method !== "GET" || url.origin !== self.location.origin) return;
+  // Live media streams must always be NetworkOnly - NEVER cache
+  if (url.pathname.startsWith("/api/media/") || url.pathname.includes(".m3u8") || url.pathname.includes(".ts") || url.pathname.includes(".m4s")) {
+    return;
+  }
   // Never intercept API calls, admin documents, authentication or RSC fetches.
   if (request.mode === "navigate" && url.pathname === "/") {
     event.respondWith((async () => {

@@ -41,7 +41,7 @@ const STATIONS: RadioStation[] = [
     tag: 'تمرکز و کار',
     logo: '☕',
     desc: 'ریتم‌های آرامش‌بخش لوفای هیپ‌هاپ برای باز کردن ذهن، مطالعه عمیق و برنامه‌نویسی',
-    streamUrl: 'https://stream.zeno.fm/f3wvbbqmdg8uv',
+    streamUrl: '/api/media/radio/lofi',
     tone: 'blue',
   },
   {
@@ -50,7 +50,7 @@ const STATIONS: RadioStation[] = [
     tag: 'آرامش عمیق',
     logo: '🧘',
     desc: 'فرکانس‌های ۴۳۲ هرتز، امواج تتا و زنگ‌های تبتی برای کاهش فوری استرس و خواب آرام',
-    streamUrl: 'https://stream.zeno.fm/75nswy9f4h8uv',
+    streamUrl: '/api/media/radio/meditation',
     tone: 'mint',
   },
   {
@@ -59,7 +59,7 @@ const STATIONS: RadioStation[] = [
     tag: 'تک‌نوازی و ذن',
     logo: '🎹',
     desc: 'ملودی‌های لطیف پیانو و سازهای زهی کلاسیک برای همراهی لحظات تفکر و نوشتن',
-    streamUrl: 'https://stream.zeno.fm/0r0xa792kwzuv',
+    streamUrl: '/api/media/radio/piano',
     tone: 'purple',
   },
   {
@@ -68,7 +68,7 @@ const STATIONS: RadioStation[] = [
     tag: 'الهام‌بخش',
     logo: '🌌',
     desc: 'صداهای ژرف و بی‌پایان کیهان برای گسترش آگاهی، رویاپردازی و ریلکسیشن',
-    streamUrl: 'https://stream.zeno.fm/w062e73k2h8uv',
+    streamUrl: '/api/media/radio/ambient',
     tone: 'gold',
   },
 ];
@@ -104,13 +104,28 @@ export default function RadioHub() {
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
+  const masterGainRef = useRef<GainNode | null>(null);
   const synthNodesRef = useRef<{ [key: string]: { gain: GainNode; source: any } }>({});
 
-  // Initialize Web Audio Synthesizers for Ambient Sounds
+  // Initialize Web Audio Synthesizers for Ambient Sounds (Singleton with Master Chain)
   const getAudioContext = useCallback(() => {
     if (!audioCtxRef.current || audioCtxRef.current.state === 'closed') {
       const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-      audioCtxRef.current = new AudioCtx();
+      const ctx = new AudioCtx({ latencyHint: 'interactive' });
+
+      const master = ctx.createGain();
+      const comp = ctx.createDynamicsCompressor();
+      comp.threshold.setValueAtTime(-24, ctx.currentTime);
+      comp.knee.setValueAtTime(30, ctx.currentTime);
+      comp.ratio.setValueAtTime(12, ctx.currentTime);
+      comp.attack.setValueAtTime(0.003, ctx.currentTime);
+      comp.release.setValueAtTime(0.25, ctx.currentTime);
+
+      master.connect(comp);
+      comp.connect(ctx.destination);
+
+      masterGainRef.current = master;
+      audioCtxRef.current = ctx;
     }
     if (audioCtxRef.current.state === 'suspended') {
       audioCtxRef.current.resume();
@@ -149,12 +164,28 @@ export default function RadioHub() {
     const ctx = getAudioContext();
     if (!ctx) return;
 
+    // Cleanly stop and dispose old node when volume is set to 0
+    if (vol === 0) {
+      const existing = synthNodesRef.current[soundId];
+      if (existing) {
+        try {
+          existing.gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.05);
+          setTimeout(() => {
+            try {
+              if (existing.source.stop) existing.source.stop();
+              existing.source.disconnect();
+            } catch {}
+          }, 60);
+        } catch {}
+        delete synthNodesRef.current[soundId];
+      }
+      return;
+    }
+
     if (!synthNodesRef.current[soundId]) {
-      if (vol === 0) return;
-      // Build sound generator
       const gain = ctx.createGain();
       gain.gain.setValueAtTime(0, ctx.currentTime);
-      gain.connect(ctx.destination);
+      gain.connect(masterGainRef.current || ctx.destination);
 
       if (soundId === 'rain') {
         const src = ctx.createBufferSource();
@@ -175,10 +206,9 @@ export default function RadioHub() {
         filter.type = 'lowpass';
         filter.frequency.value = 400;
 
-        // LFO for wave modulation
         const lfo = ctx.createOscillator();
         const lfoGain = ctx.createGain();
-        lfo.frequency.value = 0.12; // wave cycle ~8 seconds
+        lfo.frequency.value = 0.12;
         lfoGain.gain.value = 350;
         lfo.connect(filter.frequency);
         lfo.start();
@@ -220,12 +250,11 @@ export default function RadioHub() {
         src.start();
         synthNodesRef.current[soundId] = { gain, source: src };
       } else if (soundId === 'bowl') {
-        // Tibetan harmonic chime
         const osc = ctx.createOscillator();
         const osc2 = ctx.createOscillator();
         osc.type = 'sine';
         osc2.type = 'sine';
-        osc.frequency.value = 216; // 432 / 2
+        osc.frequency.value = 216;
         osc2.frequency.value = 432;
         const subGain = ctx.createGain();
         subGain.gain.value = 0.3;
@@ -320,13 +349,22 @@ export default function RadioHub() {
   }, []);
 
   const toggleStationPlay = (station = selectedStation) => {
+    const streamEndpoint = `/api/media/radio/${station.id}`;
     if (!audioRef.current) {
-      audioRef.current = new Audio(station.streamUrl);
+      audioRef.current = new Audio(streamEndpoint);
     }
+
+    // Ensure user gesture resumes Web Audio context
+    try {
+      const ctx = getAudioContext();
+      if (ctx && ctx.state === 'suspended') {
+        ctx.resume();
+      }
+    } catch {}
 
     if (selectedStation.id !== station.id) {
       setSelectedStation(station);
-      audioRef.current.src = station.streamUrl;
+      audioRef.current.src = streamEndpoint;
       setStationLoading(true);
       audioRef.current
         .play()
@@ -346,6 +384,7 @@ export default function RadioHub() {
       setIsStationPlaying(false);
     } else {
       setStationLoading(true);
+      audioRef.current.src = streamEndpoint;
       audioRef.current
         .play()
         .then(() => {
