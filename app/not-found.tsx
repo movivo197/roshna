@@ -1,0 +1,1 @@
+export default function NotFound(){return <main className="g-error-page" dir="rtl"><h1>این مسیر پیدا نشد.</h1><p>مسیر تازه‌ای از صفحه اصلی شروع کن.</p><a href="/" className="g-btn primary">بازگشت به روشنا</a></main>}

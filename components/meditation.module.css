@@ -1,0 +1,589 @@
+/* ─── Meditation Hub CSS Module ─────────────────────────────── */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-bottom: 3rem;
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Hero / Header ────────────────────────────────────────── */
+.hero {
+  border-radius: 1.5rem;
+  padding: 2.2rem;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.12);
+  transition: background 0.6s ease;
+}
+
+.heroBackgroundPattern {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle at 80% 20%, rgba(255,255,255,0.12) 0%, transparent 50%),
+                    radial-gradient(circle at 10% 80%, rgba(255,255,255,0.08) 0%, transparent 40%);
+  pointer-events: none;
+}
+
+.heroHeaderTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.chakraBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 0.4rem 0.9rem;
+  border-radius: 2rem;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.chakraDot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  box-shadow: 0 0 10px currentColor;
+}
+
+.streakPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.35rem 0.85rem;
+  border-radius: 2rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.heroTitle {
+  font-size: 1.8rem;
+  font-weight: 900;
+  line-height: 1.4;
+  margin: 0 0 0.5rem;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.15);
+}
+
+.heroSubtitle {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.88);
+  max-width: 580px;
+  line-height: 1.9;
+  margin: 0 0 1.5rem;
+}
+
+.heroMeta {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.heroMetaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* ─── Level Switcher ───────────────────────────────────────── */
+.levelBar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 0.5rem;
+  border-radius: 1.25rem;
+}
+
+.levelBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.85rem 0.5rem;
+  border-radius: 0.9rem;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  color: var(--muted);
+}
+
+.levelBtn:hover {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.levelBtnActive {
+  background: var(--surface);
+  border-color: var(--line);
+  color: var(--text);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.levelBtn strong {
+  font-size: 0.95rem;
+  font-weight: 800;
+  display: block;
+}
+
+.levelBtn small {
+  font-size: 0.7rem;
+  margin-top: 0.2rem;
+  opacity: 0.8;
+}
+
+/* ─── Main Two-Column Grid ─────────────────────────────────── */
+.grid {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── Practice Session Arena (Left Card) ────────────────────── */
+.arenaCard {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 1.5rem;
+  padding: 2.2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+/* Chakra Aura Glow behind orb */
+.chakraAura {
+  position: absolute;
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  filter: blur(65px);
+  opacity: 0.22;
+  pointer-events: none;
+  transition: all 0.8s ease;
+}
+
+/* ─── Interactive Breathing Circle / Mandala ───────────────── */
+.mandalaWrap {
+  width: 270px;
+  height: 270px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 1.5rem 0 2rem;
+}
+
+.mandalaRingOuter {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px dashed var(--line);
+  animation: rotateSlow 45s linear infinite;
+  transition: border-color 0.5s;
+}
+
+.mandalaRingMiddle {
+  position: absolute;
+  inset: 22px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  opacity: 0.6;
+}
+
+@keyframes rotateSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Breathing Orb */
+.breathingOrb {
+  width: 175px;
+  height: 175px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.6s ease;
+  user-select: none;
+}
+
+.orbInhale {
+  transform: scale(1.22);
+}
+
+.orbHold {
+  transform: scale(1.22);
+  filter: brightness(1.1);
+}
+
+.orbExhale {
+  transform: scale(0.85);
+}
+
+.orbRest {
+  transform: scale(1);
+}
+
+.phaseTitle {
+  font-size: 1.35rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.phaseSeconds {
+  font-size: 1.6rem;
+  font-weight: 800;
+  font-family: monospace;
+  margin-top: 0.1rem;
+}
+
+.phaseSub {
+  font-size: 0.7rem;
+  opacity: 0.85;
+  margin-top: 0.2rem;
+}
+
+/* Session Timer & Progress */
+.sessionTimerRow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 1.5rem;
+}
+
+.sessionTimeNumber {
+  font-size: 2.2rem;
+  font-weight: 850;
+  font-family: monospace;
+  color: var(--text);
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+
+.sessionPatternLabel {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+/* Duration Setting Buttons */
+.durationBar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.75rem;
+  background: var(--bg);
+  padding: 0.35rem;
+  border-radius: 2rem;
+  border: 1px solid var(--line);
+}
+
+.durationBtn {
+  padding: 0.4rem 0.85rem;
+  border-radius: 1.5rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--muted);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.durationBtn:hover:not(:disabled) {
+  color: var(--text);
+}
+
+.durationBtnActive {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* Practice Controls */
+.controlsRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  max-width: 380px;
+  justify-content: center;
+}
+
+.playBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: 0.95rem 1.6rem;
+  border-radius: 1.1rem;
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s, filter 0.2s;
+}
+
+.playBtn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+}
+
+.iconControlBtn {
+  width: 48px;
+  height: 48px;
+  border-radius: 1rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.iconControlBtn:hover {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--text);
+}
+
+.iconControlActive {
+  color: #059669;
+  border-color: #059669;
+  background: #ecfdf5;
+}
+
+[data-theme=dark] .iconControlActive {
+  background: #064e3b30;
+  color: #34d399;
+}
+
+/* ─── Technique Details & Philosophy (Right Card) ──────────── */
+.detailsCol {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.infoCard {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 1.5rem;
+  padding: 1.6rem;
+  box-shadow: var(--shadow);
+}
+
+.infoCardHead {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 1rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  color: var(--text);
+}
+
+.infoCardHead svg {
+  color: var(--green);
+}
+
+.benefitsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.benefitItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  font-size: 0.85rem;
+  line-height: 1.8;
+  color: var(--text);
+}
+
+.benefitItem svg {
+  color: #059669;
+  flex-shrink: 0;
+  margin-top: 0.25rem;
+}
+
+.philosophyText {
+  font-size: 0.85rem;
+  line-height: 2;
+  color: var(--muted);
+  margin: 0;
+  background: var(--bg);
+  padding: 1.1rem;
+  border-radius: 1rem;
+  border-right: 3px solid var(--green);
+}
+
+.stepsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.stepItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  line-height: 1.8;
+  color: var(--text);
+}
+
+.stepNum {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--muted);
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+}
+
+/* ─── Completion State ─────────────────────────────────────── */
+.completionScreen {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 1.5rem;
+  padding: 3rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.25rem;
+  box-shadow: var(--shadow);
+  animation: fadeIn 0.5s ease-out;
+}
+
+.completionLotus {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+  color: #059669;
+  box-shadow: 0 10px 30px rgba(5, 150, 105, 0.2);
+}
+
+.completionTitle {
+  font-size: 1.6rem;
+  font-weight: 900;
+  margin: 0;
+  color: var(--text);
+}
+
+.completionText {
+  font-size: 0.95rem;
+  color: var(--muted);
+  max-width: 440px;
+  line-height: 1.9;
+  margin: 0;
+}
+
+.completionStats {
+  display: flex;
+  gap: 1.5rem;
+  margin: 1rem 0;
+}
+
+.compStatBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.9rem 1.4rem;
+  border-radius: 1rem;
+  background: var(--bg);
+  border: 1px solid var(--line);
+}
+
+.compStatBox strong {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--text);
+}
+
+.compStatBox span {
+  font-size: 0.72rem;
+  color: var(--muted);
+  margin-top: 0.2rem;
+}
+
+.finishActionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.8rem;
+  border-radius: 1rem;
+  background: var(--green);
+  color: #fff;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.finishActionBtn:hover {
+  transform: translateY(-2px);
+}

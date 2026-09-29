@@ -1,0 +1,27 @@
+{
+  "id": "/",
+  "name": "روشنا +۳۳ | خانه زندگی تو",
+  "short_name": "روشنا",
+  "description": "خانه زندگی تو؛ امروز من، مسیرهای رشد، پروژه، خودشناسی، گفتگو و بازی",
+  "lang": "fa",
+  "dir": "rtl",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#070d18",
+  "theme_color": "#0c1a30",
+  "categories": ["productivity", "lifestyle", "social", "games"],
+  "shortcuts": [
+    {"name":"امروز من","short_name":"امروز","url":"/#home","icons":[{"src":"/icons/icon-192.png","sizes":"192x192"}]},
+    {"name":"مسیرهای رشد","short_name":"مسیرها","url":"/#journeys","icons":[{"src":"/icons/icon-192.png","sizes":"192x192"}]},
+    {"name":"همراه شخصی","short_name":"همراه","url":"/#companion","icons":[{"src":"/icons/icon-192.png","sizes":"192x192"}]},
+    {"name":"گفتگو","short_name":"گفتگو","url":"/#community","icons":[{"src":"/icons/icon-192.png","sizes":"192x192"}]},
+    {"name":"اخبار و بازار","short_name":"بازار","url":"/#markets","icons":[{"src":"/icons/icon-192.png","sizes":"192x192"}]},
+    {"name":"باشگاه بازی","short_name":"بازی","url":"/#games","icons":[{"src":"/icons/icon-192.png","sizes":"192x192"}]}
+  ],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

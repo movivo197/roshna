@@ -1,0 +1,649 @@
+/* ─── Workout Hub CSS Module (Red / Crimson Aesthetic) ──────── */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-bottom: 3rem;
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Hero Header ─────────────────────────────────────────── */
+.hero {
+  border-radius: 1.5rem;
+  padding: 2.2rem;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 35px rgba(225, 29, 72, 0.18);
+  background: linear-gradient(135deg, #991b1b 0%, #450a0a 100%);
+}
+
+.heroBackgroundPattern {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle at 85% 25%, rgba(255,255,255,0.15) 0%, transparent 45%),
+                    radial-gradient(circle at 15% 85%, rgba(239,68,68,0.2) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.heroHeaderTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.cardioBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 0.4rem 0.9rem;
+  border-radius: 2rem;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fee2e2;
+}
+
+.fireDot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #f87171;
+  box-shadow: 0 0 10px #f87171;
+}
+
+.streakPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.35rem 0.85rem;
+  border-radius: 2rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.heroTitle {
+  font-size: 1.8rem;
+  font-weight: 900;
+  line-height: 1.4;
+  margin: 0 0 0.5rem;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.heroSubtitle {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 580px;
+  line-height: 1.9;
+  margin: 0 0 1.5rem;
+}
+
+.heroMeta {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.heroMetaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* ─── Level Switcher ──────────────────────────────────────── */
+.levelBar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 0.5rem;
+  border-radius: 1.25rem;
+}
+
+.levelBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.85rem 0.5rem;
+  border-radius: 0.9rem;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  color: var(--muted);
+}
+
+.levelBtn:hover {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.levelBtnActive {
+  background: var(--surface);
+  border-color: var(--line);
+  color: var(--text);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.levelBtn strong {
+  font-size: 0.95rem;
+  font-weight: 800;
+  display: block;
+}
+
+.levelBtn small {
+  font-size: 0.7rem;
+  margin-top: 0.2rem;
+  opacity: 0.8;
+}
+
+/* ─── Two-Column Grid ─────────────────────────────────────── */
+.grid {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── Arena Card (Left) ───────────────────────────────────── */
+.arenaCard {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 1.5rem;
+  padding: 2.2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.redAura {
+  position: absolute;
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  background: #dc2626;
+  filter: blur(75px);
+  opacity: 0.16;
+  pointer-events: none;
+}
+
+/* Cardio Pulse Dial */
+.dialWrap {
+  width: 270px;
+  height: 270px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 1.5rem 0 2rem;
+}
+
+.dialTrack {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px dashed rgba(220, 38, 38, 0.25);
+  animation: rotateTrack 40s linear infinite;
+}
+
+@keyframes rotateTrack {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.dialOrb {
+  width: 185px;
+  height: 185px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 10px 40px rgba(220, 38, 38, 0.3);
+  background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  user-select: none;
+}
+
+.dialOrbPulsing {
+  animation: cardiacBeat 1.2s ease-in-out infinite;
+}
+
+.dialOrbRest {
+  background: linear-gradient(135deg, #475569 0%, #1e293b 100%) !important;
+  box-shadow: 0 10px 30px rgba(71, 85, 105, 0.3) !important;
+}
+
+@keyframes cardiacBeat {
+  0% { transform: scale(1); }
+  18% { transform: scale(1.08); }
+  32% { transform: scale(1.02); }
+  45% { transform: scale(1.1); }
+  75% { transform: scale(1); }
+}
+
+.movementPhaseLabel {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  opacity: 0.9;
+  text-transform: uppercase;
+}
+
+.movementSecondsLeft {
+  font-size: 2.8rem;
+  font-weight: 900;
+  font-family: monospace;
+  line-height: 1.1;
+  margin: 0.1rem 0;
+}
+
+.movementNameBadge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 0.2rem 0.6rem;
+  border-radius: 1rem;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Current Movement Headline & Info */
+.movementHeadline {
+  margin-bottom: 1rem;
+}
+
+.movementTitle {
+  font-size: 1.3rem;
+  font-weight: 850;
+  color: var(--text);
+  margin: 0 0 0.4rem;
+}
+
+.movementTip {
+  font-size: 0.85rem;
+  color: var(--muted);
+  max-width: 440px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+/* Live Session Metrics (Time & Calories) */
+.metricsRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  margin: 0.5rem 0 1.5rem;
+}
+
+.metricBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.metricValue {
+  font-size: 1.8rem;
+  font-weight: 900;
+  font-family: monospace;
+  color: var(--text);
+  line-height: 1;
+}
+
+.metricLabel {
+  font-size: 0.72rem;
+  color: var(--muted);
+  margin-top: 0.25rem;
+}
+
+/* Duration Bar */
+.durationBar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.75rem;
+  background: var(--bg);
+  padding: 0.35rem;
+  border-radius: 2rem;
+  border: 1px solid var(--line);
+}
+
+.durationBtn {
+  padding: 0.4rem 0.85rem;
+  border-radius: 1.5rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--muted);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.durationBtn:hover:not(:disabled) {
+  color: var(--text);
+}
+
+.durationBtnActive {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* Controls */
+.controlsRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  max-width: 380px;
+  justify-content: center;
+}
+
+.playBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: 0.95rem 1.6rem;
+  border-radius: 1.1rem;
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.3);
+  transition: transform 0.2s, filter 0.2s;
+}
+
+.playBtn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+}
+
+.iconControlBtn {
+  width: 48px;
+  height: 48px;
+  border-radius: 1rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.iconControlBtn:hover {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--text);
+}
+
+.iconControlActive {
+  color: #dc2626;
+  border-color: #dc2626;
+  background: #fef2f2;
+}
+
+[data-theme=dark] .iconControlActive {
+  background: #450a0a40;
+  color: #f87171;
+}
+
+/* ─── Details Column (Right) ──────────────────────────────── */
+.detailsCol {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.infoCard {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 1.5rem;
+  padding: 1.6rem;
+  box-shadow: var(--shadow);
+}
+
+.infoCardHead {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 1rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  color: var(--text);
+}
+
+.infoCardHead svg {
+  color: #dc2626;
+}
+
+.benefitsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.benefitItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  font-size: 0.85rem;
+  line-height: 1.8;
+  color: var(--text);
+}
+
+.benefitItem svg {
+  color: #dc2626;
+  flex-shrink: 0;
+  margin-top: 0.25rem;
+}
+
+.scienceText {
+  font-size: 0.85rem;
+  line-height: 2;
+  color: var(--muted);
+  margin: 0;
+  background: var(--bg);
+  padding: 1.1rem;
+  border-radius: 1rem;
+  border-right: 3px solid #dc2626;
+}
+
+/* Movements Accordion List */
+.movementsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.movementRow {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  padding: 1rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.movementRowHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.movementRowHeader strong {
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.intensityTag {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 1rem;
+}
+
+.intensityLow {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.intensityModerate {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.intensityHigh {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.muscleTags {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.muscleTag {
+  font-size: 0.7rem;
+  color: var(--muted);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 0.15rem 0.5rem;
+  border-radius: 0.5rem;
+}
+
+/* ─── Completion Screen ───────────────────────────────────── */
+.completionScreen {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 1.5rem;
+  padding: 3rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.25rem;
+  box-shadow: var(--shadow);
+  animation: fadeIn 0.5s ease-out;
+}
+
+.completionTrophy {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #fee2e2, #fca5a5);
+  color: #dc2626;
+  box-shadow: 0 10px 30px rgba(220, 38, 38, 0.25);
+}
+
+.completionTitle {
+  font-size: 1.6rem;
+  font-weight: 900;
+  margin: 0;
+  color: var(--text);
+}
+
+.completionText {
+  font-size: 0.95rem;
+  color: var(--muted);
+  max-width: 440px;
+  line-height: 1.9;
+  margin: 0;
+}
+
+.completionStats {
+  display: flex;
+  gap: 1.5rem;
+  margin: 1rem 0;
+}
+
+.compStatBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.9rem 1.4rem;
+  border-radius: 1rem;
+  background: var(--bg);
+  border: 1px solid var(--line);
+}
+
+.compStatBox strong {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--text);
+}
+
+.compStatBox span {
+  font-size: 0.72rem;
+  color: var(--muted);
+  margin-top: 0.2rem;
+}
+
+.finishActionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.8rem;
+  border-radius: 1rem;
+  background: #dc2626;
+  color: #fff;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.finishActionBtn:hover {
+  transform: translateY(-2px);
+}
