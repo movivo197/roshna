@@ -98,7 +98,7 @@ export async function GET(
       return new Response(rewritten.ok ? rewritten.content : text, {
         status: upstream.status,
         headers: {
-          'Content-Type': 'application/vnd.apple.mpegurl; charset=utf-8',
+          'Content-Type': 'application/vnd.apple.mpegurl',
           'Cache-Control': 'no-store, no-cache, must-revalidate',
           'X-Accel-Buffering': 'no',
           'Access-Control-Allow-Origin': '*',

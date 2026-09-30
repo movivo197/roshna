@@ -52,6 +52,22 @@ export function isPrivateOrInternalHost(host: string): boolean {
   return false;
 }
 
+export const TRUSTED_MEDIA_DOMAINS = [
+  'persiana.live',
+  'wns.live',
+  'avatv.live',
+  '4utv.live',
+  'akamaized.net',
+  'medya.trt.com.tr',
+  'trtworld.com',
+  'iranintl.com',
+  'radiojavan.com',
+  'avang.live',
+  'telewebion.ir',
+  'telewebion.com',
+  'zeno.fm',
+];
+
 /**
  * Validates upstream URL against scheme, SSRF checks, and per-source host allowlist.
  */
@@ -80,7 +96,8 @@ export function validateUpstreamUrl(
 
   // Allowlist verification with boundary-safe suffix matching
   if (allowedHosts.length > 0) {
-    const isAllowed = allowedHosts.some(allowed => {
+    const combinedAllowed = [...allowedHosts, ...TRUSTED_MEDIA_DOMAINS];
+    const isAllowed = combinedAllowed.some(allowed => {
       const a = allowed.toLowerCase().trim();
       return host === a || host.endsWith('.' + a);
     });

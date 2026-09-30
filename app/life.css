@@ -2567,29 +2567,37 @@
 }
 
 /* ─────────────────────────────────────────────────────────────
-   LIVE INTERNET TV / IPTV PLAYER STYLES
+   LIVE INTERNET TV / IPTV PLAYER STYLES (MOBILE-FIRST SAFE)
    ───────────────────────────────────────────────────────────── */
 .tv-hub-container {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 22px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .tv-hero-header {
-  padding: 34px 38px;
-  border-radius: 26px;
+  padding: 30px 34px;
+  border-radius: 24px;
   background: radial-gradient(ellipse at 12% 40%, rgba(212, 175, 55, 0.14), transparent 65%), var(--surface);
   border: 1px solid var(--line);
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 20px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .tv-hero-info {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-width: 0;
 }
 
 .tv-eyebrow {
@@ -2602,10 +2610,11 @@
 }
 
 .tv-hero-info h1 {
-  font-size: clamp(24px, 3vw, 36px);
+  font-size: clamp(22px, 3vw, 34px);
   margin: 0;
   color: var(--text);
   font-weight: 850;
+  line-height: 1.4;
 }
 
 .tv-hero-info p {
@@ -2621,6 +2630,7 @@
   flex-direction: column;
   align-items: flex-end;
   gap: 6px;
+  flex-shrink: 0;
 }
 
 .tv-live-pill {
@@ -2633,6 +2643,7 @@
   border: 1px solid rgba(239, 68, 68, 0.35);
   color: #f87171;
   font-size: 12.5px;
+  white-space: nowrap;
 }
 
 .tv-pulse-dot {
@@ -2642,6 +2653,7 @@
   background: #ef4444;
   box-shadow: 0 0 10px #ef4444;
   animation: pulseDot 1.4s infinite;
+  flex-shrink: 0;
 }
 
 .tv-pulse-dot.small {
@@ -2657,6 +2669,7 @@
 .tv-hero-badge small {
   font-size: 10.5px;
   color: var(--muted);
+  white-space: nowrap;
 }
 
 .tv-main-grid {
@@ -2664,23 +2677,32 @@
   grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr);
   gap: 24px;
   align-items: start;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .tv-player-column {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .tv-player-wrapper {
   position: relative;
   width: 100%;
+  max-width: 100%;
   aspect-ratio: 16 / 9;
-  border-radius: 24px;
+  border-radius: 22px;
   overflow: hidden;
   background: #000;
   border: 1px solid rgba(212, 175, 55, 0.35);
   box-shadow: 0 14px 45px rgba(0, 0, 0, 0.4);
+  box-sizing: border-box;
 }
 
 .tv-player-wrapper.fullscreen {
@@ -2709,15 +2731,16 @@
   color: #fff;
   z-index: 5;
   text-align: center;
-  padding: 20px;
+  padding: 16px;
+  box-sizing: border-box;
 }
 
 .tv-player-overlay.error {
-  background: rgba(20, 10, 10, 0.9);
+  background: rgba(20, 10, 10, 0.92);
 }
 
 .tv-player-overlay.error strong {
-  font-size: 17px;
+  font-size: 16px;
   color: #f87171;
 }
 
@@ -2725,6 +2748,7 @@
   font-size: 12px;
   color: #d1d5db;
   margin: 0;
+  max-width: 320px;
 }
 
 .tv-spin {
@@ -2737,18 +2761,24 @@
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 12px 18px;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.88), transparent);
+  padding: 10px 14px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.6) 70%, transparent 100%);
   display: flex;
   justify-content: space-between;
   align-items: center;
   z-index: 4;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .tv-controls-left, .tv-controls-right {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
+  min-width: 0;
+  flex-shrink: 1;
 }
 
 .tv-ctrl-btn {
@@ -2756,12 +2786,13 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: #fff;
   border-radius: 10px;
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   display: grid;
   place-items: center;
   cursor: pointer;
   transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
 .tv-ctrl-btn:hover {
@@ -2775,14 +2806,25 @@
   border-color: #d4af37;
 }
 
+.tv-server-ctrl-btn {
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 8px;
+  width: auto;
+  white-space: nowrap;
+}
+
 .tv-volume-box {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
 .tv-volume-slider {
-  width: 75px;
+  width: 70px;
   accent-color: #d4af37;
   cursor: pointer;
 }
@@ -2790,60 +2832,111 @@
 .tv-channel-tag {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 4px 12px;
+  gap: 6px;
+  padding: 4px 10px;
   border-radius: 12px;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.65);
   border: 1px solid rgba(255, 255, 255, 0.15);
   color: #fff;
-  font-size: 12px;
+  font-size: 11.5px;
+  min-width: 0;
+  max-width: 180px;
+  overflow: hidden;
+}
+
+.tv-tag-logo {
+  flex-shrink: 0;
+}
+
+.tv-tag-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11.5px;
 }
 
 .tv-live-tag {
   background: #ef4444;
   color: #fff;
-  font-size: 9.5px;
+  font-size: 9px;
   font-weight: 800;
-  padding: 2px 6px;
-  border-radius: 6px;
+  padding: 2px 5px;
+  border-radius: 5px;
+  flex-shrink: 0;
 }
 
 .tv-channel-details-card {
-  padding: 24px;
-  border-radius: 22px;
+  padding: 22px;
+  border-radius: 20px;
   background: var(--surface);
   border: 1px solid var(--line);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .tv-det-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .tv-det-title {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
 }
 
 .tv-det-icon {
-  font-size: 32px;
+  font-size: 30px;
+  flex-shrink: 0;
 }
 
 .tv-det-title h2 {
-  font-size: 18px;
+  font-size: 17px;
   margin: 0;
   color: var(--text);
 }
 
 .tv-det-title p {
-  font-size: 12.5px;
+  font-size: 12px;
   color: var(--muted);
   margin: 3px 0 0;
+}
+
+.tv-det-badges-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.tv-det-server-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  background: rgba(212, 175, 55, 0.12);
+  color: #f3d47b;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.tv-det-server-btn:hover {
+  background: rgba(212, 175, 55, 0.22);
+  border-color: #d4af37;
 }
 
 .tv-det-badge {
@@ -2854,6 +2947,7 @@
   background: rgba(212, 175, 55, 0.15);
   color: #d4af37;
   border: 1px solid rgba(212, 175, 55, 0.3);
+  white-space: nowrap;
 }
 
 .tv-epg-box {
@@ -2872,6 +2966,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-width: 0;
 }
 
 .tv-epg-item.current {
@@ -2895,6 +2990,9 @@
 .tv-epg-item strong {
   font-size: 12.5px;
   color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Right Sidebar: Channels list */
@@ -2902,13 +3000,24 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .tv-cats-pills {
   display: flex;
   gap: 8px;
   overflow-x: auto;
-  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 6px;
+  width: 100%;
+  max-width: 100%;
+}
+
+.tv-cats-pills::-webkit-scrollbar {
+  display: none;
 }
 
 .tv-cat-btn {
@@ -2925,6 +3034,7 @@
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
 .tv-cat-btn:hover {
@@ -2946,6 +3056,8 @@
   max-height: 520px;
   overflow-y: auto;
   padding-left: 4px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .tv-ch-card {
@@ -2959,6 +3071,9 @@
   gap: 12px;
   text-align: right;
   transition: all 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+  min-width: 0;
 }
 
 .tv-ch-card:hover {
@@ -2997,11 +3112,15 @@
 .tv-ch-name-row strong {
   font-size: 13.5px;
   color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .tv-fav-star {
   color: #d4af37;
   font-size: 13px;
+  flex-shrink: 0;
 }
 
 .tv-ch-info small {
@@ -3022,6 +3141,7 @@
   background: var(--bg);
   color: #d4af37;
   border: 1px solid var(--line);
+  flex-shrink: 0;
 }
 
 .tv-sidebar-foot {
@@ -3034,14 +3154,102 @@
   border: 1px solid var(--line);
   color: var(--muted);
   font-size: 11px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-@media(max-width: 960px) {
+/* ─────────────────────────────────────────────────────────────
+   RESPONSIVE BREAKPOINTS FOR LIVE TV
+   ───────────────────────────────────────────────────────────── */
+@media (max-width: 960px) {
   .tv-main-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 100%;
+    gap: 18px;
   }
   .tv-channels-list {
-    max-height: 380px;
+    max-height: 420px;
+  }
+}
+
+@media (max-width: 768px) {
+  .tv-hub-container {
+    gap: 14px;
+  }
+  .tv-hero-header {
+    padding: 18px 16px;
+    border-radius: 18px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .tv-hero-info h1 {
+    font-size: 20px;
+  }
+  .tv-hero-info p {
+    font-size: 12px;
+    line-height: 1.7;
+  }
+  .tv-hero-badge {
+    align-items: flex-start;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+  }
+  .tv-player-wrapper {
+    border-radius: 16px;
+  }
+  .tv-controls-bar {
+    padding: 6px 8px;
+    gap: 6px;
+  }
+  .tv-ctrl-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+  }
+  .tv-volume-slider {
+    display: none !important;
+  }
+  .tv-server-text {
+    display: none;
+  }
+  .tv-channel-tag {
+    max-width: 110px;
+    padding: 2px 6px;
+    font-size: 10.5px;
+  }
+  .tv-channel-details-card {
+    padding: 16px;
+    border-radius: 18px;
+    gap: 12px;
+  }
+  .tv-det-title h2 {
+    font-size: 15.5px;
+  }
+  .tv-det-title p {
+    font-size: 11px;
+  }
+  .tv-det-icon {
+    font-size: 24px;
+  }
+  .tv-epg-box {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .tv-channels-sidebar {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tv-channel-tag {
+    display: none;
+  }
+  .tv-player-wrapper {
+    border-radius: 14px;
+  }
+  .tv-controls-bar {
+    padding: 6px 8px;
   }
 }
 

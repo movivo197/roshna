@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
+import Hls from 'hls.js';
 import {
   Tv,
   Play,
@@ -24,12 +25,6 @@ import {
   Search,
   Server
 } from 'lucide-react';
-
-declare global {
-  interface Window {
-    Hls?: any;
-  }
-}
 
 export type TVChannel = {
   id: string;
@@ -457,33 +452,6 @@ export default function LiveTV() {
     } catch {}
   }, []);
 
-  // Ensure HLS.js script is loaded with fallback CDN
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (window.Hls) {
-      loadChannel(selectedChannel, 0);
-      return;
-    }
-
-    const script = document.createElement('script');
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.5.8/hls.min.js';
-    script.async = true;
-    script.onload = () => {
-      loadChannel(selectedChannel, 0);
-    };
-    script.onerror = () => {
-      // Fallback CDN
-      const fallback = document.createElement('script');
-      fallback.src = 'https://cdn.jsdelivr.net/npm/hls.js@1.5.8/dist/hls.min.js';
-      fallback.async = true;
-      fallback.onload = () => {
-        loadChannel(selectedChannel, 0);
-      };
-      document.head.appendChild(fallback);
-    };
-    document.head.appendChild(script);
-  }, []);
-
   const toggleFavorite = (channelId: string) => {
     const next = favorites.includes(channelId)
       ? favorites.filter((id) => id !== channelId)
@@ -494,9 +462,9 @@ export default function LiveTV() {
     } catch {}
   };
 
-  // Get same-origin stream endpoint through Roshana Media Gateway
-  const getStreamUrl = useCallback((channel: TVChannel, _serverIdx: number) => {
-    return `/api/media/hls/${encodeURIComponent(channel.id)}`;
+  // Get same-origin stream endpoint through Roshana Media Gateway with server index
+  const getStreamUrl = useCallback((channel: TVChannel, serverIdx: number) => {
+    return `/api/media/hls/${encodeURIComponent(channel.id)}?s=${serverIdx}`;
   }, []);
 
   // Setup HLS Player
@@ -511,14 +479,14 @@ export default function LiveTV() {
     const streamToLoad = getStreamUrl(channel, serverIdx);
 
     if (hlsInstanceRef.current) {
-      hlsInstanceRef.current.destroy();
+      try {
+        hlsInstanceRef.current.destroy();
+      } catch {}
       hlsInstanceRef.current = null;
     }
 
-    const HlsLib = window.Hls;
-
-    if (HlsLib && HlsLib.isSupported()) {
-      const hls = new HlsLib({
+    if (Hls.isSupported()) {
+      const hls = new Hls({
         enableWorker: true,
         lowLatencyMode: true,
         backBufferLength: 30,
@@ -532,21 +500,30 @@ export default function LiveTV() {
       hls.loadSource(streamToLoad);
       hls.attachMedia(video);
 
-      hls.on(HlsLib.Events.MANIFEST_PARSED, () => {
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
         setIsLoading(false);
         setHasError(false);
         video.play().then(() => setIsPlaying(true)).catch(() => {
-          setIsPlaying(false);
+          // If browser policy blocks sound autoplay, auto-fallback to muted play
+          video.muted = true;
+          setIsMuted(true);
+          video.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
         });
       });
 
-      hls.on(HlsLib.Events.ERROR, (_event: any, data: any) => {
+      hls.on(Hls.Events.ERROR, (_event: any, data: any) => {
         if (data.fatal) {
           switch (data.type) {
-            case HlsLib.ErrorTypes.NETWORK_ERROR:
-              hls.startLoad();
+            case Hls.ErrorTypes.NETWORK_ERROR:
+              const totalServers = 1 + (channel.backupUrls?.length || 0);
+              if (serverIdx + 1 < totalServers) {
+                hls.destroy();
+                loadChannel(channel, serverIdx + 1);
+              } else {
+                hls.startLoad();
+              }
               break;
-            case HlsLib.ErrorTypes.MEDIA_ERROR:
+            case Hls.ErrorTypes.MEDIA_ERROR:
               hls.recoverMediaError();
               break;
             default:
@@ -565,21 +542,25 @@ export default function LiveTV() {
       video.onloadedmetadata = () => {
         setIsLoading(false);
         setHasError(false);
-        video.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
+        video.play().then(() => setIsPlaying(true)).catch(() => {
+          // Fallback to muted playback on iOS Safari autoplay restriction
+          video.muted = true;
+          setIsMuted(true);
+          video.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
+        });
       };
       video.onerror = () => {
-        setHasError(true);
-        setIsLoading(false);
-      };
-    } else {
-      setTimeout(() => {
-        if (window.Hls) {
-          loadChannel(channel, serverIdx);
+        const totalServers = 1 + (channel.backupUrls?.length || 0);
+        if (serverIdx + 1 < totalServers) {
+          loadChannel(channel, serverIdx + 1);
         } else {
           setHasError(true);
           setIsLoading(false);
         }
-      }, 700);
+      };
+    } else {
+      setHasError(true);
+      setIsLoading(false);
     }
   }, [getStreamUrl]);
 
@@ -587,7 +568,9 @@ export default function LiveTV() {
     loadChannel(selectedChannel, 0);
     return () => {
       if (hlsInstanceRef.current) {
-        hlsInstanceRef.current.destroy();
+        try {
+          hlsInstanceRef.current.destroy();
+        } catch {}
         hlsInstanceRef.current = null;
       }
     };
@@ -680,6 +663,11 @@ export default function LiveTV() {
               ref={videoRef}
               className="tv-video-element"
               playsInline
+              // @ts-ignore
+              webkit-playsinline="true"
+              x5-playsinline="true"
+              autoPlay
+              muted={isMuted}
               onClick={togglePlay}
               onPlay={() => setIsPlaying(true)}
               onPause={() => setIsPlaying(false)}
@@ -698,7 +686,7 @@ export default function LiveTV() {
                 <Tv size={42} />
                 <strong>سیگنال این سرور در دسترس نیست</strong>
                 <p>می‌توانید سرور کمکی را تغییر دهید یا شبکه دیگری را انتخاب کنید.</p>
-                <div style={{ display: 'flex', gap: '10px' }}>
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', justifyContent: 'center' }}>
                   {availableServersCount > 1 && (
                     <button type="button" className="g-btn primary" onClick={switchServer}>
                       <Server size={15} /> تعویض سرور پخش (سرور {currentServerIndex + 1} از {availableServersCount})
@@ -733,7 +721,7 @@ export default function LiveTV() {
                 </div>
                 <div className="tv-channel-tag">
                   <span className="tv-tag-logo">{selectedChannel.logo}</span>
-                  <strong>{selectedChannel.name}</strong>
+                  <strong className="tv-tag-name">{selectedChannel.name}</strong>
                   <span className="tv-live-tag">زنده</span>
                 </div>
               </div>
@@ -742,13 +730,12 @@ export default function LiveTV() {
                 {availableServersCount > 1 && (
                   <button
                     type="button"
-                    className="tv-ctrl-btn"
+                    className="tv-ctrl-btn tv-server-ctrl-btn"
                     onClick={switchServer}
                     title={`تعویض سرور (سرور ${currentServerIndex + 1} از ${availableServersCount})`}
-                    style={{ fontSize: '11px', display: 'flex', gap: '4px', padding: '0 8px' }}
                   >
                     <Server size={15} />
-                    <span>سرور {currentServerIndex + 1}</span>
+                    <span className="tv-server-text">سرور {currentServerIndex + 1}</span>
                   </button>
                 )}
                 <button
@@ -776,7 +763,20 @@ export default function LiveTV() {
                   <p>{selectedChannel.description}</p>
                 </div>
               </div>
-              <span className="tv-det-badge">{selectedChannel.badge}</span>
+              <div className="tv-det-badges-row">
+                {availableServersCount > 1 && (
+                  <button
+                    type="button"
+                    className="tv-det-server-btn"
+                    onClick={switchServer}
+                    title="تغییر سرور پخش زنده"
+                  >
+                    <Server size={13} />
+                    <span>سرور {currentServerIndex + 1}</span>
+                  </button>
+                )}
+                <span className="tv-det-badge">{selectedChannel.badge}</span>
+              </div>
             </div>
 
             {/* EPG Program Guide */}
