@@ -1,10 +1,12 @@
 import type { Metadata, Viewport } from 'next';
+import Script from 'next/script';
 import './globals.css';
 import './gadgets.css';
 import './polish.css';
 import './superapp.css';
 import './life.css';
-import {ThemeProvider} from '@/components/theme';
+import { ThemeProvider } from '@/components/theme';
+import { TelegramProvider } from '@/components/telegram-provider';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://roshna.moeid.net'),
@@ -24,7 +26,15 @@ export default function RootLayout({children}:{children: React.ReactNode}) {
   return (
     <html lang="fa" dir="rtl" suppressHydrationWarning>
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <Script
+          src="/vendor/telegram-web-app.js"
+          strategy="beforeInteractive"
+        />
+        <ThemeProvider>
+          <TelegramProvider>
+            {children}
+          </TelegramProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

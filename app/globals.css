@@ -17,3 +17,25 @@
 .g-lang-card{display:flex;align-items:center;gap:16px;width:100%;text-align:right;background:linear-gradient(135deg,#1a3a5c 0%,#0d2340 100%);border:none;border-radius:14px;padding:20px 22px;cursor:pointer;transition:transform .18s,box-shadow .18s;box-shadow:0 4px 20px #0d234022;position:relative;overflow:hidden}.g-lang-card::before{content:'';position:absolute;width:220px;height:220px;border-radius:50%;border:1px solid rgba(255,255,255,.07);left:-60px;top:-110px;pointer-events:none}.g-lang-card:hover{transform:translateY(-2px);box-shadow:0 8px 28px #0d234040}.g-lang-card-flag{font-size:2.6rem;line-height:1;flex-shrink:0;filter:drop-shadow(0 2px 8px rgba(0,0,0,.4))}.g-lang-card-body{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}.g-lang-card-body small{font-size:9px;font-weight:700;letter-spacing:.07em;color:#7ab8f5;text-transform:uppercase}.g-lang-card-body strong{font-size:14px;font-weight:800;color:#e8f4fd;line-height:1.5}.g-lang-card-body span{font-size:10px;color:#5a8ab0}.g-lang-card-arrow{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.1);color:#7ab8f5;flex-shrink:0;transition:background .18s,transform .18s}.g-lang-card:hover .g-lang-card-arrow{background:rgba(255,255,255,.18);transform:translateX(-3px)}
 [data-theme=dark] .g-lang-card{background:linear-gradient(135deg,#1e3f63,#0f2540)}
 
+/* Telegram Mini App Adaptations */
+body.is-telegram-webapp {
+  overscroll-behavior-y: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+body.is-telegram-webapp input,
+body.is-telegram-webapp textarea {
+  -webkit-user-select: auto;
+  user-select: auto;
+}
+.is-telegram-webapp .g-pwa-wrap {
+  display: none !important;
+}
+.is-telegram-webapp .g-topbar {
+  padding-top: max(0px, env(safe-area-inset-top));
+}
+.is-telegram-webapp .g-bottom-nav {
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+}
+
+
